@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/api/src/main.ts",
     "build": "npm run lint && tsc -p tsconfig.server.json",
+    "build:client": "vite build",
+    "build:vercel": "npm run lint && npm run build:client",
     "start": "NODE_ENV=production node dist/main.js",
     "audit": "npm audit",
     "test": "vitest run",

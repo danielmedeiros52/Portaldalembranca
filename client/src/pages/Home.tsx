@@ -46,19 +46,18 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="fade-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 rounded-full text-teal-700 text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" />
-                Memoriais Digitais do Futuro
-              </div>
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Honre memórias com{" "}
-                <span className="text-gradient">tecnologia</span> e{" "}
-                <span className="text-gradient-rose">amor</span>
-              </h1>
-              <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                Crie memoriais digitais eternos acessíveis através de códigos QR. 
-                Uma forma moderna e significativa de preservar e compartilhar histórias de vida.
-              </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 rounded-full text-teal-700 text-sm font-medium mb-6">
+              <Sparkles className="w-4 h-4" />
+              Versão piloto em Pernambuco
+            </div>
+            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+              Honre memórias com{" "}
+              <span className="text-gradient">tecnologia</span> e cuidado{" "}
+              <span className="text-gradient-rose">local</span>
+            </h1>
+            <p className="text-xl text-gray-600 leading-relaxed mb-8">
+              Memoriais digitais com QR Code no túmulo, preparados para o dia a dia das funerárias pernambucanas e para famílias que querem preservar histórias em um ambiente seguro e perene.
+            </p>
               <div className="flex flex-wrap gap-4">
                 <Button 
                   onClick={() => setLocation("/login")} 
@@ -79,16 +78,16 @@ export default function Home() {
               {/* Stats */}
               <div className="flex gap-8 mt-12 pt-8 border-t border-gray-100">
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">500+</p>
-                  <p className="text-sm text-gray-500">Memoriais Criados</p>
+                  <p className="text-3xl font-bold text-gray-900">15 min</p>
+                  <p className="text-sm text-gray-500">Tempo médio para ativar um memorial</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">50+</p>
-                  <p className="text-sm text-gray-500">Funerárias Parceiras</p>
+                  <p className="text-3xl font-bold text-gray-900">4 parceiros</p>
+                  <p className="text-sm text-gray-500">Funerárias e cemitérios em Recife/RMR</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">10k+</p>
-                  <p className="text-sm text-gray-500">Visitantes/mês</p>
+                  <p className="text-3xl font-bold text-gray-900">Placa + QR</p>
+                  <p className="text-sm text-gray-500">Entrega pronta para ser fixada no túmulo</p>
                 </div>
               </div>
             </div>
@@ -146,7 +145,7 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Como Funciona</h2>
             <div className="section-divider mb-6"></div>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Uma solução completa para funerárias e famílias criarem memoriais digitais significativos
+              Uma solução completa para funerárias, famílias e acervos históricos criarem memoriais digitais significativos
             </p>
           </div>
 
@@ -162,19 +161,19 @@ export default function Home() {
                   <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-teal-600"></div>
                   </div>
-                  Crie memoriais em minutos
+                  Ative um memorial junto com o contrato do funeral
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-teal-600"></div>
                   </div>
-                  Gere códigos QR únicos
+                  Gere código QR e acompanhe a produção da placa
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-teal-600"></div>
                   </div>
-                  Convide famílias automaticamente
+                  Painel com comissões e status dos memoriais
                 </li>
               </ul>
             </div>
@@ -190,19 +189,19 @@ export default function Home() {
                   <div className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-rose-600"></div>
                   </div>
-                  Complete com fotos e histórias
+                  Preencha biografia, fotos e homenagens com segurança
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-rose-600"></div>
                   </div>
-                  Adicione descendentes
+                  Registre descendentes e mantenha a árvore da família
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-rose-600"></div>
                   </div>
-                  Compartilhe com entes queridos
+                  Compartilhe o link ou QR para toda a rede de afetos
                 </li>
               </ul>
             </div>
@@ -212,25 +211,25 @@ export default function Home() {
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-cyan-600 to-cyan-500 flex items-center justify-center mb-6">
                 <Heart className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Para Visitantes</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Para Patrimônio</h3>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-cyan-600"></div>
                   </div>
-                  Escaneie e acesse instantaneamente
+                  Mapeie túmulos de relevância histórica e cultural
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-cyan-600"></div>
                   </div>
-                  Deixe dedicações e memórias
+                  Disponibilize QR Codes para acervo público e visitas guiadas
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center mt-0.5">
                     <div className="w-2 h-2 rounded-full bg-cyan-600"></div>
                   </div>
-                  Honre o legado eternamente
+                  Baseie roteiros educativos e turismo de memória em dados confiáveis
                 </li>
               </ul>
             </div>
@@ -255,7 +254,7 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-gray-600 mb-6">
-                "O Portal da Lembrança transformou a forma como honramos nossos entes queridos. A família ficou emocionada ao ver todas as memórias reunidas em um só lugar."
+                "Conseguimos organizar fotos, biografia e descendentes da minha avó em poucas horas. A placa com QR Code já está no túmulo e a família inteira consegue acessar sem complicação."
               </p>
               <div className="flex items-center gap-3">
                 <img 
@@ -278,7 +277,7 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-gray-600 mb-6">
-                "Como funerária, oferecemos este serviço há 6 meses e nossos clientes adoram. É um diferencial que agrega muito valor ao nosso trabalho."
+                "Apresentamos o memorial durante a contratação e a família costuma aceitar na hora. O painel com status e comissões ajuda nossa equipe a acompanhar cada caso." 
               </p>
               <div className="flex items-center gap-3">
                 <img 
@@ -301,7 +300,7 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-gray-600 mb-6">
-                "Visitei o túmulo do meu avô e pude escanear o QR Code para ver fotos e histórias que eu nem conhecia. Foi muito emocionante."
+                "Estamos catalogando túmulos históricos do Recife e colocando QR Codes para quem visita. O acervo online virou referência para roteiros educativos." 
               </p>
               <div className="flex items-center gap-3">
                 <img 
@@ -328,16 +327,16 @@ export default function Home() {
             <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3"></div>
             
             <div className="relative z-10">
-              <h2 className="text-4xl font-bold text-white mb-4">Pronto para Começar?</h2>
+              <h2 className="text-4xl font-bold text-white mb-4">Pronto para pilotar?</h2>
               <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Junte-se a centenas de funerárias e famílias que já estão preservando memórias de forma moderna e significativa.
+                Conecte sua funerária ou família ao Portal da Lembrança em Pernambuco e valide a experiência com QR Codes, placas físicas e suporte dedicado.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
-                <Button 
+                <Button
                   onClick={() => setLocation("/login")}
                   className="bg-white text-teal-700 font-semibold px-8 py-4 rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-lg"
                 >
-                  Criar Conta Gratuita
+                  Solicitar acesso ao piloto
                 </Button>
                 <Button 
                   onClick={() => setLocation("/m/maria-silva-santos")}
