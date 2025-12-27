@@ -1,6 +1,7 @@
 {
   "version": 2,
   "framework": "vite",
+  "installCommand": "corepack enable && corepack use pnpm@9.15.4 && pnpm install",
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist/public",
   "rewrites": [
