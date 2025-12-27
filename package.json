@@ -1,16 +1,17 @@
 {
   "name": "memorial-qr-mvp",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
-    "build": "vite build && esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node dist/index.js",
-    "check": "tsc --noEmit",
-    "format": "prettier --write .",
+    "dev": "NODE_ENV=development tsx watch server/api/src/main.ts",
+    "build": "npm run lint && tsc -p tsconfig.server.json",
+    "start": "NODE_ENV=production node dist/main.js",
+    "audit": "npm audit",
     "test": "vitest run",
-    "db:push": "drizzle-kit generate && drizzle-kit migrate"
+    "test:cov": "vitest run --coverage",
+    "lint": "tsc -p tsconfig.server.json --outDir .lint-tmp && eslint \".lint-tmp/**/*.js\" && rm -rf .lint-tmp",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
@@ -95,7 +96,6 @@
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.31.4",
     "esbuild": "^0.25.0",
-    "pnpm": "^10.15.1",
     "postcss": "^8.4.47",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.14",
@@ -106,7 +106,7 @@
     "vite-plugin-manus-runtime": "^0.0.56",
     "vitest": "^2.1.4"
   },
-  "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",
+  "packageManager": "npm@10.9.0",
   "pnpm": {
     "patchedDependencies": {
       "wouter@3.7.1": "patches/wouter@3.7.1.patch"
@@ -114,5 +114,8 @@
     "overrides": {
       "tailwindcss>nanoid": "3.3.7"
     }
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
