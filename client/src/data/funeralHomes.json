@@ -1,0 +1,15 @@
+{
+  "funeralHomes": [
+    {
+      "id": 1,
+      "name": "Funerária Paz Eterna",
+      "email": "contato@pazeterna.com.br",
+      "phone": "(11) 3456-7890",
+      "address": "Av. Paulista, 1000 - Bela Vista, São Paulo - SP",
+      "logo": "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=100&h=100&fit=crop",
+      "description": "Há mais de 50 anos oferecendo serviços funerários com dignidade e respeito.",
+      "createdAt": "2020-01-15T10:00:00Z",
+      "updatedAt": "2024-01-01T10:00:00Z"
+    }
+  ]
+}

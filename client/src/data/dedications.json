@@ -1,0 +1,84 @@
+{
+  "dedications": [
+    {
+      "id": 1,
+      "memorialId": 1,
+      "authorName": "Ana Paula Silva",
+      "authorPhoto": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face",
+      "message": "Mãe querida, você foi a luz da nossa família. Suas receitas, seus conselhos e principalmente seu amor incondicional estarão sempre em nossos corações. Obrigada por tudo que nos ensinou. Saudades eternas. 💕",
+      "createdAt": "2024-01-12T14:30:00Z"
+    },
+    {
+      "id": 2,
+      "memorialId": 1,
+      "authorName": "Sofia Maria Silva",
+      "authorPhoto": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=face",
+      "message": "Vovó, você sempre tinha um abraço quentinho e um bolo delicioso esperando por nós. Suas histórias e seu carinho ficarão para sempre em minha memória. Te amo eternamente. 🌸",
+      "createdAt": "2024-01-13T09:15:00Z"
+    },
+    {
+      "id": 3,
+      "memorialId": 1,
+      "authorName": "Carla Mendes",
+      "authorPhoto": null,
+      "message": "Dona Maria foi minha vizinha por 30 anos. Uma mulher de coração enorme, sempre pronta a ajudar. Seu jardim era o mais bonito da rua e ela sempre compartilhava flores conosco. Descanse em paz, querida amiga.",
+      "createdAt": "2024-01-14T16:45:00Z"
+    },
+    {
+      "id": 4,
+      "memorialId": 1,
+      "authorName": "Pedro Henrique Silva",
+      "authorPhoto": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face",
+      "message": "Mãe, você nos ensinou o verdadeiro significado de família. Sua força, sua dedicação e seu amor serão sempre nosso guia. Obrigado por tudo. Até um dia.",
+      "createdAt": "2024-01-15T11:20:00Z"
+    },
+    {
+      "id": 5,
+      "memorialId": 2,
+      "authorName": "Roberto Carlos Santos",
+      "authorPhoto": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face",
+      "message": "Pai, você foi meu herói e meu melhor amigo. Obrigado por todos os ensinamentos, pelas viagens inesquecíveis e por ser um exemplo de integridade. Seu legado vive em nós.",
+      "createdAt": "2023-11-07T10:30:00Z"
+    },
+    {
+      "id": 6,
+      "memorialId": 2,
+      "authorName": "Mateus Oliveira Santos",
+      "authorPhoto": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=50&h=50&fit=crop&crop=face",
+      "message": "Vovô, suas histórias de viagens me inspiraram a conhecer o mundo. Você me ensinou que a curiosidade é o maior tesouro. Sentirei falta das nossas conversas na biblioteca.",
+      "createdAt": "2023-11-08T15:00:00Z"
+    },
+    {
+      "id": 7,
+      "memorialId": 2,
+      "authorName": "Dr. Marcos Ribeiro",
+      "authorPhoto": null,
+      "message": "Carlos foi um colega exemplar e um engenheiro brilhante. Trabalhamos juntos em projetos que transformaram cidades. Sua ética e competência eram admiradas por todos. Descanse em paz, amigo.",
+      "createdAt": "2023-11-10T09:00:00Z"
+    },
+    {
+      "id": 8,
+      "memorialId": 3,
+      "authorName": "Mariana Ferreira Costa",
+      "authorPhoto": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=50&h=50&fit=crop&crop=face",
+      "message": "Pai querido, obrigada por ser sempre tão presente e amoroso. Você foi o melhor pai que alguém poderia ter. Sua alegria e seu sorriso iluminavam qualquer ambiente. Te amarei para sempre.",
+      "createdAt": "2024-02-16T08:00:00Z"
+    },
+    {
+      "id": 9,
+      "memorialId": 3,
+      "authorName": "Antônio Pereira",
+      "authorPhoto": null,
+      "message": "Professor João mudou minha vida. Quando eu estava prestes a desistir da escola, ele acreditou em mim. Hoje sou engenheiro graças a ele. Obrigado por tudo, mestre.",
+      "createdAt": "2024-02-17T14:30:00Z"
+    },
+    {
+      "id": 10,
+      "memorialId": 3,
+      "authorName": "Time Juvenil Esperança FC",
+      "authorPhoto": null,
+      "message": "Técnico João, você nos ensinou muito mais que futebol. Nos ensinou sobre respeito, trabalho em equipe e nunca desistir. Você será eternamente nosso capitão. 🏆⚽",
+      "createdAt": "2024-02-18T10:00:00Z"
+    }
+  ]
+}

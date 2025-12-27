@@ -1,0 +1,55 @@
+{
+  "memorials": [
+    {
+      "id": 1,
+      "slug": "maria-silva-santos",
+      "fullName": "Maria Silva Santos",
+      "birthDate": "1945-03-15",
+      "deathDate": "2024-01-10",
+      "birthplace": "São Paulo, SP",
+      "filiation": "Filha de João Silva e Rosa Santos",
+      "biography": "Maria foi uma mulher dedicada à família e à comunidade. Nascida em São Paulo, cresceu em uma família humilde e aprendeu desde cedo o valor do trabalho e da generosidade. Casou-se aos 22 anos com Carlos Santos, com quem compartilhou 50 anos de união.\n\nFoi professora primária por 35 anos, tocando a vida de milhares de crianças. Sua paixão pela jardinagem transformou sua casa em um verdadeiro jardim botânico, onde recebia amigos e família para tardes de café e bolo de chocolate - sua especialidade que todos amavam.\n\nMaria deixa um legado de amor, dedicação e bondade que continuará inspirando todos que tiveram o privilégio de conhecê-la.",
+      "visibility": "public",
+      "status": "active",
+      "funeralHomeId": 1,
+      "familyUserId": 1,
+      "mainPhoto": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face",
+      "createdAt": "2024-01-11T10:00:00Z",
+      "updatedAt": "2024-01-15T14:30:00Z"
+    },
+    {
+      "id": 2,
+      "slug": "carlos-oliveira-santos",
+      "fullName": "Carlos Oliveira Santos",
+      "birthDate": "1942-07-22",
+      "deathDate": "2023-11-05",
+      "birthplace": "Rio de Janeiro, RJ",
+      "filiation": "Filho de Antonio Oliveira e Maria Conceição",
+      "biography": "Carlos foi um homem de caráter exemplar que dedicou sua vida à engenharia e à família. Formado pela UFRJ em 1965, trabalhou em grandes projetos de infraestrutura pelo Brasil.\n\nSua paixão por viagens o levou a conhecer mais de 30 países, sempre acompanhado de sua esposa Helena. Era um leitor voraz e mantinha uma biblioteca com mais de 2.000 livros.\n\nComo avô, era conhecido por suas histórias fascinantes e pela paciência infinita com os netos. Carlos deixa um legado de integridade, curiosidade e amor pela vida.",
+      "visibility": "public",
+      "status": "active",
+      "funeralHomeId": 1,
+      "familyUserId": 2,
+      "mainPhoto": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+      "createdAt": "2023-11-06T09:00:00Z",
+      "updatedAt": "2023-11-20T16:45:00Z"
+    },
+    {
+      "id": 3,
+      "slug": "joao-ferreira-costa",
+      "fullName": "João Ferreira Costa",
+      "birthDate": "1950-05-10",
+      "deathDate": "2024-02-14",
+      "birthplace": "Belo Horizonte, MG",
+      "filiation": "Filho de Pedro Ferreira e Antônia Costa",
+      "biography": "João era conhecido por sua alegria contagiante e dedicação ao ensino. Professor de matemática por 40 anos, transformou a vida de milhares de estudantes com sua metodologia única e paciência infinita.\n\nApaixonado por futebol, foi técnico voluntário de times juvenis por duas décadas. Sua casa sempre estava cheia de música - tocava violão e cantava em rodas de samba com os amigos.\n\nJoão nos ensinou que a vida deve ser vivida com paixão e generosidade. Seu sorriso e suas lições permanecerão em nossos corações.",
+      "visibility": "public",
+      "status": "active",
+      "funeralHomeId": 1,
+      "familyUserId": 3,
+      "mainPhoto": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+      "createdAt": "2024-02-15T11:00:00Z",
+      "updatedAt": "2024-02-18T09:20:00Z"
+    }
+  ]
+}
