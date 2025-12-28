@@ -493,6 +493,33 @@ export default function PublicMemorialPage() {
                 )}
               </div>
             </section>
+
+            {/* CTA - Create Family Memorial */}
+            {memorial.isHistorical && (
+              <section className="card-modern p-5 sm:p-6 fade-in stagger-6 bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-100">
+                <div className="text-center">
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-teal-100 flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-teal-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    Crie um memorial para sua família
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Preserve a memória de seus entes queridos com um memorial digital personalizado, assim como este.
+                  </p>
+                  <Button 
+                    onClick={() => setLocation('/checkout')}
+                    className="btn-primary w-full sm:w-auto"
+                  >
+                    <QrCode className="w-4 h-4 mr-2" />
+                    Criar Memorial
+                  </Button>
+                  <p className="text-xs text-gray-500 mt-3">
+                    A partir de R$ 19,90/ano
+                  </p>
+                </div>
+              </section>
+            )}
           </div>
         </div>
       </main>
