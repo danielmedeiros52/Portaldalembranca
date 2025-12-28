@@ -79,6 +79,50 @@
       "relationship": "Neto",
       "photo": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
       "createdAt": "2024-02-16T10:00:00Z"
+    },
+    {
+      "id": 11,
+      "memorialId": 4,
+      "name": "Maurício Nabuco",
+      "relationship": "Filho",
+      "photo": null,
+      "description": "Diplomata, seguiu os passos do pai e também foi embaixador do Brasil nos Estados Unidos",
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 12,
+      "memorialId": 4,
+      "name": "Joaquim Nabuco Filho",
+      "relationship": "Filho",
+      "photo": null,
+      "description": "Sacerdote da Igreja Católica, chegou a ser monsenhor e protonotário papal",
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 13,
+      "memorialId": 4,
+      "name": "Carolina Nabuco",
+      "relationship": "Filha",
+      "photo": null,
+      "description": "Escritora de renome, autora da biografia de seu pai",
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 14,
+      "memorialId": 4,
+      "name": "Mariana Nabuco",
+      "relationship": "Filha",
+      "photo": null,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 15,
+      "memorialId": 4,
+      "name": "José Tomás Nabuco",
+      "relationship": "Filho",
+      "photo": null,
+      "description": "Casou-se com Maria do Carmo Alvim de Melo Franco Nabuco, filha de Afrânio de Melo Franco",
+      "createdAt": "2024-12-28T00:00:00Z"
     }
   ]
 }

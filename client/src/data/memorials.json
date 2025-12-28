@@ -50,6 +50,33 @@
       "mainPhoto": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
       "createdAt": "2024-02-15T11:00:00Z",
       "updatedAt": "2024-02-18T09:20:00Z"
+    },
+    {
+      "id": 4,
+      "slug": "joaquim-nabuco",
+      "fullName": "Joaquim Aurélio Barreto Nabuco de Araújo",
+      "birthDate": "1849-08-19",
+      "deathDate": "1910-01-17",
+      "birthplace": "Recife, Pernambuco",
+      "filiation": "Filho de José Tomás Nabuco de Araújo Filho e Ana Benigna de Sá Barreto Nabuco de Araújo",
+      "biography": "Joaquim Nabuco foi um dos mais importantes políticos, diplomatas, historiadores e juristas brasileiros do século XIX. Nascido no Recife em 19 de agosto de 1849, foi o principal líder do movimento abolicionista brasileiro, sendo responsável em grande parte pela abolição da escravidão no Brasil em 1888.\n\nSua infância no Engenho Massangana, sob os cuidados de sua madrinha Ana Rosa Falcão de Carvalho, moldou profundamente sua visão sobre a escravidão. O contato com os escravos do engenho despertou nele uma consciência humanitária que o acompanharia por toda a vida.\n\nFormou-se em Direito pela Faculdade de Direito do Recife em 1870, tendo como colegas os futuros presidentes Rodrigues Alves e Afonso Pena, além do poeta Castro Alves e do jurista Ruy Barbosa. Manteve uma longa amizade com Machado de Assis, com quem trocava correspondências.\n\nComo deputado, liderou a bancada abolicionista na Câmara dos Deputados e fundou a Sociedade Antiescravidão Brasileira. Sua obra 'O Abolicionismo' (1883) tornou-se referência fundamental do movimento. Foi um dos fundadores da Academia Brasileira de Letras.\n\nNa carreira diplomática, serviu como embaixador do Brasil nos Estados Unidos (1905-1910), onde recebeu o título de Doutor Honoris Causa em Letras pela Universidade Yale em 1908. Presidiu a III Conferência Pan-americana no Rio de Janeiro em 1906.\n\nCasou-se em 1889 com Evelina Torres Soares Ribeiro, com quem teve cinco filhos: Maurício (diplomata), Joaquim (sacerdote), Carolina (escritora), Mariana e José Tomás.\n\nFaleceu em Washington, D.C., em 17 de janeiro de 1910, aos 60 anos, vítima de Policitemia vera. Seu corpo foi trasladado para o Brasil e sepultado no Cemitério de Santo Amaro, em Recife, sua cidade natal. Em sua homenagem, o dia 19 de agosto é celebrado como o Dia Nacional do Historiador.\n\n\"O verdadeiro patriotismo é o que concilia a pátria com a humanidade.\" - Joaquim Nabuco",
+      "visibility": "public",
+      "status": "active",
+      "funeralHomeId": null,
+      "familyUserId": null,
+      "mainPhoto": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663098186173/NIgcNYsiygzhPiOX.jpg",
+      "createdAt": "2024-12-28T00:00:00Z",
+      "updatedAt": "2024-12-28T00:00:00Z",
+      "isHistorical": true,
+      "category": "Patrimônio Histórico",
+      "references": [
+        "https://pt.wikipedia.org/wiki/Joaquim_Nabuco",
+        "https://www.ebiografia.com/joaquim_nabuco/",
+        "https://www.academia.org.br/academicos/joaquim-nabuco/biografia",
+        "https://www.gov.br/fundaj/pt-br",
+        "https://visite.museus.gov.br/instituicoes/engenho-massangana/"
+      ],
+      "graveLocation": "Cemitério de Santo Amaro, Recife, PE"
     }
   ]
 }

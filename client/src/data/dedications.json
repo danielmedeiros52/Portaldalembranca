@@ -79,6 +79,41 @@
       "authorPhoto": null,
       "message": "Técnico João, você nos ensinou muito mais que futebol. Nos ensinou sobre respeito, trabalho em equipe e nunca desistir. Você será eternamente nosso capitão. 🏆⚽",
       "createdAt": "2024-02-18T10:00:00Z"
+    },
+    {
+      "id": 11,
+      "memorialId": 4,
+      "authorName": "Machado de Assis",
+      "authorPhoto": null,
+      "message": "Meu querido amigo Nabuco, sua luta pela liberdade dos escravizados é a mais nobre causa de nossa geração. Sua eloquência e convicção inspiram a todos nós. O Brasil lhe deve eterna gratidão.",
+      "createdAt": "1888-05-13T12:00:00Z",
+      "isHistorical": true
+    },
+    {
+      "id": 12,
+      "memorialId": 4,
+      "authorName": "Ruy Barbosa",
+      "authorPhoto": null,
+      "message": "Nabuco foi o mais brilhante dos abolicionistas. Sua obra 'O Abolicionismo' é um marco na história do pensamento brasileiro. Perdemos um gigante, mas seu legado é imortal.",
+      "createdAt": "1910-01-18T10:00:00Z",
+      "isHistorical": true
+    },
+    {
+      "id": 13,
+      "memorialId": 4,
+      "authorName": "Academia Brasileira de Letras",
+      "authorPhoto": null,
+      "message": "Joaquim Nabuco, fundador desta Casa, deixa um legado literário e político incomparável. Sua cadeira permanecerá como símbolo de sua grandeza intelectual e moral.",
+      "createdAt": "1910-01-20T14:00:00Z",
+      "isHistorical": true
+    },
+    {
+      "id": 14,
+      "memorialId": 4,
+      "authorName": "Fundação Joaquim Nabuco",
+      "authorPhoto": null,
+      "message": "Preservamos a memória e o legado de Joaquim Nabuco desde 1949. Sua luta pela justiça social e pela dignidade humana continua a inspirar gerações de brasileiros.",
+      "createdAt": "2024-08-19T10:00:00Z"
     }
   ]
 }
