@@ -6,6 +6,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ProfilePage from "./pages/ProfilePage";
+import CheckoutPage from "./pages/CheckoutPage";
 import FuneralHomeDashboard from "./pages/FuneralHomeDashboard";
 import FamilyDashboard from "./pages/FamilyDashboard";
 import MemorialEditPage from "./pages/MemorialEditPage";
@@ -17,6 +21,10 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/login"} component={LoginPage} />
+      <Route path={"/register"} component={RegisterPage} />
+      <Route path={"/forgot-password"} component={ForgotPasswordPage} />
+      <Route path={"/profile"} component={ProfilePage} />
+      <Route path={"/checkout"} component={CheckoutPage} />
       <Route path={"/dashboard/funeral-home"} component={FuneralHomeDashboard} />
       <Route path={"/dashboard/family"} component={FamilyDashboard} />
       <Route path={"/memorial/edit/:id"} component={MemorialEditPage} />

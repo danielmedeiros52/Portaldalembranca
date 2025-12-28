@@ -92,7 +92,11 @@ export default function FamilyDashboard() {
               <Bell className="w-5 h-5" />
               Notificações
             </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
+            <a 
+              href="#" 
+              onClick={(e) => { e.preventDefault(); setLocation("/profile"); }}
+              className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+            >
               <Settings className="w-5 h-5" />
               Configurações
             </a>

@@ -145,7 +145,7 @@ export default function LoginPage() {
                       <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
                       <span className="text-sm text-gray-600">Lembrar-me</span>
                     </label>
-                    <a href="#" className="text-sm text-teal-600 hover:text-teal-700">Esqueceu a senha?</a>
+                    <a href="#" onClick={(e) => { e.preventDefault(); setLocation("/forgot-password"); }} className="text-sm text-teal-600 hover:text-teal-700">Esqueceu a senha?</a>
                   </div>
                   <Button type="submit" className="w-full btn-primary">
                     Entrar como Funerária
@@ -193,7 +193,7 @@ export default function LoginPage() {
                       <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500" />
                       <span className="text-sm text-gray-600">Lembrar-me</span>
                     </label>
-                    <a href="#" className="text-sm text-rose-600 hover:text-rose-700">Esqueceu a senha?</a>
+                    <a href="#" onClick={(e) => { e.preventDefault(); setLocation("/forgot-password"); }} className="text-sm text-rose-600 hover:text-rose-700">Esqueceu a senha?</a>
                   </div>
                   <Button type="submit" className="w-full btn-secondary">
                     Entrar como Família
@@ -212,7 +212,7 @@ export default function LoginPage() {
             {/* Register Link */}
             <p className="text-center text-gray-500 mt-6">
               Não tem uma conta?{" "}
-              <a href="#" className="text-teal-600 hover:text-teal-700 font-medium">Registre-se</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); setLocation("/register"); }} className="text-teal-600 hover:text-teal-700 font-medium">Registre-se</a>
             </p>
           </div>
         </div>

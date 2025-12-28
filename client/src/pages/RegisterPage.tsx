@@ -1,0 +1,427 @@
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { 
+  QrCode, Building2, Users, ArrowLeft, Eye, EyeOff, 
+  Mail, Lock, User, Phone, MapPin, FileText, Loader2, CheckCircle2
+} from "lucide-react";
+import { APP_TITLE } from "@/const";
+import { authService, RegisterData } from "@/services/authService";
+
+export default function RegisterPage() {
+  const [, setLocation] = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [userType, setUserType] = useState<"funeral_home" | "family">("family");
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  
+  // Form fields
+  const [formData, setFormData] = useState<RegisterData>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    userType: "family",
+    companyName: "",
+    cnpj: "",
+    address: ""
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleUserTypeChange = (type: "funeral_home" | "family") => {
+    setUserType(type);
+    setFormData(prev => ({ ...prev, userType: type }));
+  };
+
+  const validateForm = (): boolean => {
+    if (!formData.name.trim()) {
+      toast.error("Por favor, informe seu nome completo.");
+      return false;
+    }
+    if (!formData.email.trim()) {
+      toast.error("Por favor, informe seu e-mail.");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast.error("Por favor, informe um e-mail válido.");
+      return false;
+    }
+    if (!formData.phone.trim()) {
+      toast.error("Por favor, informe seu telefone.");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres.");
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("As senhas não coincidem.");
+      return false;
+    }
+    if (userType === "funeral_home") {
+      if (!formData.companyName?.trim()) {
+        toast.error("Por favor, informe o nome da funerária.");
+        return false;
+      }
+      if (!formData.cnpj?.trim()) {
+        toast.error("Por favor, informe o CNPJ.");
+        return false;
+      }
+    }
+    if (!acceptTerms) {
+      toast.error("Você precisa aceitar os termos de uso.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    
+    try {
+      const response = await authService.register(formData);
+      
+      if (response.success) {
+        toast.success(response.message);
+        // Redirect to appropriate dashboard
+        if (userType === "funeral_home") {
+          setLocation("/dashboard/funeral-home");
+        } else {
+          setLocation("/dashboard/family");
+        }
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      toast.error("Erro ao criar conta. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 11) {
+      return numbers.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
+    return value;
+  };
+
+  const formatCNPJ = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 14) {
+      return numbers.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+    }
+    return value;
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Left Side - Decorative */}
+      <div className="hidden lg:flex lg:w-1/2 gradient-hero relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-20 left-20 w-40 h-40 bg-white/10 rounded-full"></div>
+        <div className="absolute bottom-40 right-20 w-60 h-60 bg-white/10 rounded-full"></div>
+        <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-white/5 rounded-full"></div>
+        
+        <div className="relative z-10 flex flex-col justify-center px-16">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+              <QrCode className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-white">{APP_TITLE}</span>
+          </div>
+          
+          <h1 className="text-4xl font-bold text-white mb-6 leading-tight">
+            Junte-se a nós e preserve memórias.
+          </h1>
+          <p className="text-xl text-white/80 mb-8 max-w-md">
+            Crie sua conta para começar a homenagear quem você ama com memoriais digitais únicos.
+          </p>
+
+          {/* Benefits */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-white/90">Cadastro rápido e gratuito</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-white/90">Memoriais ilimitados</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-white/90">Suporte dedicado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Register Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 overflow-y-auto">
+        <div className="w-full max-w-md">
+          {/* Back Button */}
+          <button 
+            onClick={() => setLocation("/login")}
+            className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar ao login
+          </button>
+
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+              <QrCode className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">{APP_TITLE}</span>
+          </div>
+
+          <div className="card-modern p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Crie sua conta</h2>
+            <p className="text-gray-500 mb-6">Preencha seus dados para começar.</p>
+
+            <Tabs value={userType} onValueChange={(v) => handleUserTypeChange(v as "funeral_home" | "family")}>
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100 p-1 rounded-xl">
+                <TabsTrigger 
+                  value="family"
+                  className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                >
+                  <Users className="w-4 h-4" />
+                  Família
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="funeral_home"
+                  className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                >
+                  <Building2 className="w-4 h-4" />
+                  Funerária
+                </TabsTrigger>
+              </TabsList>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Common Fields */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder={userType === "funeral_home" ? "Nome do responsável" : "Seu nome completo"}
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="input-modern pl-12"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                {/* Funeral Home Specific Fields */}
+                <TabsContent value="funeral_home" className="mt-0 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nome da Funerária</label>
+                    <div className="relative">
+                      <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        name="companyName"
+                        placeholder="Funerária Exemplo Ltda"
+                        value={formData.companyName}
+                        onChange={handleChange}
+                        className="input-modern pl-12"
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">CNPJ</label>
+                    <div className="relative">
+                      <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        name="cnpj"
+                        placeholder="00.000.000/0000-00"
+                        value={formData.cnpj}
+                        onChange={(e) => setFormData(prev => ({ ...prev, cnpj: formatCNPJ(e.target.value) }))}
+                        className="input-modern pl-12"
+                        maxLength={18}
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Endereço</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        name="address"
+                        placeholder="Rua, número, bairro, cidade"
+                        value={formData.address}
+                        onChange={handleChange}
+                        className="input-modern pl-12"
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder={userType === "funeral_home" ? "contato@funeraria.com.br" : "seu@email.com"}
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="input-modern pl-12"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="(81) 99999-0000"
+                      value={formData.phone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: formatPhone(e.target.value) }))}
+                      className="input-modern pl-12"
+                      maxLength={15}
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Mínimo 6 caracteres"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="input-modern pl-12 pr-12"
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Confirm Password */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Senha</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder="Repita a senha"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="input-modern pl-12 pr-12"
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Terms */}
+                <div className="flex items-start gap-3">
+                  <input 
+                    type="checkbox" 
+                    id="terms"
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    className={`w-4 h-4 mt-1 rounded border-gray-300 ${userType === "funeral_home" ? "text-teal-600 focus:ring-teal-500" : "text-rose-600 focus:ring-rose-500"}`}
+                    disabled={isLoading}
+                  />
+                  <label htmlFor="terms" className="text-sm text-gray-600">
+                    Li e aceito os{" "}
+                    <a href="#" className={`${userType === "funeral_home" ? "text-teal-600 hover:text-teal-700" : "text-rose-600 hover:text-rose-700"}`}>
+                      Termos de Uso
+                    </a>{" "}
+                    e a{" "}
+                    <a href="#" className={`${userType === "funeral_home" ? "text-teal-600 hover:text-teal-700" : "text-rose-600 hover:text-rose-700"}`}>
+                      Política de Privacidade
+                    </a>
+                  </label>
+                </div>
+
+                {/* Submit Button */}
+                <Button 
+                  type="submit" 
+                  className={`w-full ${userType === "funeral_home" ? "btn-primary" : "btn-secondary"}`}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Criando conta...
+                    </>
+                  ) : (
+                    `Criar conta como ${userType === "funeral_home" ? "Funerária" : "Família"}`
+                  )}
+                </Button>
+              </form>
+            </Tabs>
+
+            {/* Login Link */}
+            <p className="text-center text-gray-500 mt-6">
+              Já tem uma conta?{" "}
+              <a 
+                href="#" 
+                onClick={(e) => { e.preventDefault(); setLocation("/login"); }}
+                className="text-teal-600 hover:text-teal-700 font-medium"
+              >
+                Faça login
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
