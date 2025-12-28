@@ -10,6 +10,8 @@ import {
   FileText, BookOpen, Newspaper, Video, Building2, GraduationCap, ExternalLink, Landmark
 } from "lucide-react";
 import { APP_TITLE } from "@/const";
+import { SEOHead, generateMemorialSEO } from "@/components/SEOHead";
+import { StructuredData, generatePersonSchema, generateBreadcrumbSchema, generateWebPageSchema } from "@/components/StructuredData";
 
 export default function PublicMemorialPage() {
   const [, setLocation] = useLocation();
@@ -94,8 +96,32 @@ export default function PublicMemorialPage() {
 
   const age = calculateAge(memorial.birthDate, memorial.deathDate);
 
+  // Gerar dados de SEO
+  const seoData = generateMemorialSEO(memorial);
+  const personSchema = generatePersonSchema(memorial);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Início', url: 'https://portaldalembranca.com.br/' },
+    { name: 'Memoriais', url: 'https://portaldalembranca.com.br/memoriais' },
+    { name: memorial.fullName },
+  ]);
+  const webPageSchema = generateWebPageSchema(
+    seoData.title,
+    seoData.description,
+    seoData.url
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* SEO Components */}
+      <SEOHead
+        title={seoData.title}
+        description={seoData.description}
+        image={seoData.image}
+        url={seoData.url}
+        type={seoData.type}
+        keywords={seoData.keywords}
+      />
+      <StructuredData data={[personSchema, breadcrumbSchema, webPageSchema]} />
       {/* Hero Section */}
       <div className="relative">
         {/* Background */}

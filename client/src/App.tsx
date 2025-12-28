@@ -15,6 +15,7 @@ import FamilyDashboard from "./pages/FamilyDashboard";
 import MemorialEditPage from "./pages/MemorialEditPage";
 import PublicMemorialPage from "./pages/PublicMemorialPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
+import MemorialsPage from "./pages/MemorialsPage";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/dashboard/funeral-home"} component={FuneralHomeDashboard} />
       <Route path={"/dashboard/family"} component={FamilyDashboard} />
       <Route path={"/memorial/edit/:id"} component={MemorialEditPage} />
+      <Route path={"/memoriais"} component={MemorialsPage} />
       <Route path={"/m/:slug"} component={PublicMemorialPage} />
       <Route path={"/accept-invitation/:token"} component={AcceptInvitationPage} />
       <Route path={"/404"} component={NotFound} />

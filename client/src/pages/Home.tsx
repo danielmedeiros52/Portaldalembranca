@@ -3,6 +3,8 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { APP_TITLE } from "@/const";
 import { Heart, QrCode, Users, Shield, Sparkles, ArrowRight, Star, X, Mail, User, Phone, CheckCircle, Check, Image } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
+import { StructuredData, organizationSchema } from "@/components/StructuredData";
 import { toast } from "sonner";
 
 export default function Home() {
@@ -51,6 +53,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white overflow-hidden">
+      {/* SEO Components */}
+      <SEOHead
+        title="Portal da Lembrança - Memoriais Digitais para Homenagear Entes Queridos"
+        description="Crie memoriais digitais para preservar a memória de seus entes queridos e personalidades históricas. Biografias, fotos, homenagens e QR Code para túmulos."
+        keywords={['memorial digital', 'homenagem', 'biografia', 'qr code memorial', 'cemitério', 'patrimônio histórico', 'pernambuco', 'recife']}
+      />
+      <StructuredData data={organizationSchema} />
+      
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.3)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
