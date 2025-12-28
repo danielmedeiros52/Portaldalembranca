@@ -3,10 +3,11 @@ import { useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { dataService, Memorial, Descendant, Photo, Dedication } from "@/services/dataService";
+import { dataService, Memorial, Descendant, Photo, Dedication, Reference } from "@/services/dataService";
 import { 
   QrCode, Heart, Calendar, MapPin, Users, Image, 
-  MessageSquare, Share2, ArrowLeft, Send, Download
+  MessageSquare, Share2, ArrowLeft, Send, Download,
+  FileText, BookOpen, Newspaper, Video, Building2, GraduationCap, ExternalLink, Landmark
 } from "lucide-react";
 import { APP_TITLE } from "@/const";
 
@@ -19,6 +20,7 @@ export default function PublicMemorialPage() {
   const [descendants, setDescendants] = useState<Descendant[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [dedications, setDedications] = useState<Dedication[]>([]);
+  const [references, setReferences] = useState<Reference[]>([]);
   const [showDedicationDialog, setShowDedicationDialog] = useState(false);
   const [showQRDialog, setShowQRDialog] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
@@ -33,14 +35,16 @@ export default function PublicMemorialPage() {
       const memorialData = await dataService.getMemorialBySlug(slug);
       if (memorialData) {
         setMemorial(memorialData);
-        const [descendantsData, photosData, dedicationsData] = await Promise.all([
+        const [descendantsData, photosData, dedicationsData, referencesData] = await Promise.all([
           dataService.getDescendantsByMemorialId(memorialData.id),
           dataService.getPhotosByMemorialId(memorialData.id),
-          dataService.getDedicationsByMemorialId(memorialData.id)
+          dataService.getDedicationsByMemorialId(memorialData.id),
+          dataService.getReferencesByMemorialId(memorialData.id)
         ]);
         setDescendants(descendantsData);
         setPhotos(photosData);
         setDedications(dedicationsData);
+        setReferences(referencesData);
       }
     };
     loadData();
@@ -242,8 +246,93 @@ export default function PublicMemorialPage() {
               </section>
             )}
 
+            {/* Documentary References */}
+            {references.length > 0 && (
+              <section className="card-modern p-5 sm:p-8 fade-in stagger-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+                    Referências Documentais
+                  </h2>
+                  <span className="text-sm text-gray-500">{references.length} fontes</span>
+                </div>
+                <p className="text-gray-600 text-sm mb-6">
+                  Documentos, matérias e fontes históricas que fundamentam e enriquecem este memorial.
+                </p>
+                <div className="space-y-3">
+                  {references.map((reference, index) => {
+                    const getIcon = (type: string) => {
+                      switch (type) {
+                        case 'article': return <FileText className="w-5 h-5" />;
+                        case 'news': return <Newspaper className="w-5 h-5" />;
+                        case 'book': return <BookOpen className="w-5 h-5" />;
+                        case 'video': return <Video className="w-5 h-5" />;
+                        case 'encyclopedia': return <BookOpen className="w-5 h-5" />;
+                        case 'biography': return <FileText className="w-5 h-5" />;
+                        case 'official': return <Building2 className="w-5 h-5" />;
+                        case 'institution': return <Landmark className="w-5 h-5" />;
+                        case 'museum': return <Landmark className="w-5 h-5" />;
+                        case 'academic': return <GraduationCap className="w-5 h-5" />;
+                        default: return <FileText className="w-5 h-5" />;
+                      }
+                    };
+                    const getTypeLabel = (type: string) => {
+                      const labels: Record<string, string> = {
+                        'article': 'Artigo',
+                        'news': 'Notícia',
+                        'book': 'Livro',
+                        'document': 'Documento',
+                        'video': 'Vídeo',
+                        'encyclopedia': 'Enciclopédia',
+                        'biography': 'Biografia',
+                        'official': 'Oficial',
+                        'institution': 'Instituição',
+                        'museum': 'Museu',
+                        'academic': 'Acadêmico'
+                      };
+                      return labels[type] || 'Documento';
+                    };
+                    return (
+                      <a
+                        key={reference.id}
+                        href={reference.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100 hover:border-amber-300 hover:shadow-md transition-all group"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="p-2 bg-amber-100 rounded-lg text-amber-700 group-hover:bg-amber-200 transition-colors">
+                            {getIcon(reference.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-medium px-2 py-0.5 bg-amber-200 text-amber-800 rounded-full">
+                                {getTypeLabel(reference.type)}
+                              </span>
+                              <span className="text-xs text-gray-500">{reference.source}</span>
+                            </div>
+                            <h4 className="font-medium text-gray-900 group-hover:text-amber-700 transition-colors flex items-center gap-2">
+                              {reference.title}
+                              <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </h4>
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{reference.description}</p>
+                            {reference.date && (
+                              <p className="text-xs text-gray-400 mt-2">
+                                {new Date(reference.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
             {/* Dedications */}
-            <section className="card-modern p-5 sm:p-8 fade-in stagger-2">
+            <section className="card-modern p-5 sm:p-8 fade-in stagger-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
                 <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
                   <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" />
@@ -361,7 +450,7 @@ export default function PublicMemorialPage() {
 
             {/* Stats */}
             <section className="card-modern p-4 sm:p-6 fade-in stagger-5">
-              <div className="grid grid-cols-2 gap-4 text-center">
+              <div className={`grid ${references.length > 0 ? 'grid-cols-3' : 'grid-cols-2'} gap-4 text-center`}>
                 <div>
                   <p className="text-2xl font-bold text-teal-600">{photos.length}</p>
                   <p className="text-sm text-gray-500">Fotos</p>
@@ -370,6 +459,12 @@ export default function PublicMemorialPage() {
                   <p className="text-2xl font-bold text-rose-500">{dedications.length}</p>
                   <p className="text-sm text-gray-500">Dedicações</p>
                 </div>
+                {references.length > 0 && (
+                  <div>
+                    <p className="text-2xl font-bold text-amber-600">{references.length}</p>
+                    <p className="text-sm text-gray-500">Fontes</p>
+                  </div>
+                )}
               </div>
             </section>
           </div>

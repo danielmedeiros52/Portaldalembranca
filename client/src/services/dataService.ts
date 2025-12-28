@@ -16,6 +16,7 @@ import photosData from '@/data/photos.json';
 import dedicationsData from '@/data/dedications.json';
 import funeralHomesData from '@/data/funeralHomes.json';
 import familyUsersData from '@/data/familyUsers.json';
+import referencesData from '@/data/references.json';
 
 // Types
 export interface Memorial {
@@ -84,6 +85,19 @@ export interface FamilyUser {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Reference {
+  id: number;
+  memorialId: number;
+  title: string;
+  description: string;
+  url: string;
+  type: 'article' | 'news' | 'book' | 'document' | 'video' | 'encyclopedia' | 'biography' | 'official' | 'institution' | 'museum' | 'academic';
+  source: string;
+  date?: string | null;
+  order: number;
+  createdAt: string;
 }
 
 // Data Service Class
@@ -165,6 +179,16 @@ class DataService {
   async getFamilyUserById(id: number): Promise<FamilyUser | undefined> {
     const familyUsers = await this.getFamilyUsers();
     return familyUsers.find(f => f.id === id);
+  }
+
+  // References (Documentary Sources)
+  async getReferences(): Promise<Reference[]> {
+    return referencesData.references as Reference[];
+  }
+
+  async getReferencesByMemorialId(memorialId: number): Promise<Reference[]> {
+    const references = await this.getReferences();
+    return references.filter(r => r.memorialId === memorialId).sort((a, b) => a.order - b.order);
   }
 
   // Statistics

@@ -1,0 +1,124 @@
+{
+  "references": [
+    {
+      "id": 1,
+      "memorialId": 4,
+      "title": "Joaquim Nabuco - Wikipédia",
+      "description": "Artigo enciclopédico completo sobre a vida, obra e legado de Joaquim Nabuco, o maior líder abolicionista brasileiro.",
+      "url": "https://pt.wikipedia.org/wiki/Joaquim_Nabuco",
+      "type": "encyclopedia",
+      "source": "Wikipédia",
+      "date": null,
+      "order": 1,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "memorialId": 4,
+      "title": "Joaquim Nabuco e o Abolicionismo",
+      "description": "Artigo da Biblioteca Nacional sobre a participação de Nabuco no movimento abolicionista que resultou na Lei Áurea de 1888.",
+      "url": "https://antigo.bn.gov.br/acontece/noticias/2020/04/joaquim-nabuco-abolicionismo",
+      "type": "article",
+      "source": "Biblioteca Nacional",
+      "date": "2020-04-27",
+      "order": 2,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 3,
+      "memorialId": 4,
+      "title": "Biografia de Joaquim Nabuco - Academia Brasileira de Letras",
+      "description": "Biografia oficial do fundador e primeiro secretário-geral da Academia Brasileira de Letras.",
+      "url": "https://www.academia.org.br/academicos/joaquim-nabuco/biografia",
+      "type": "biography",
+      "source": "Academia Brasileira de Letras",
+      "date": null,
+      "order": 3,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 4,
+      "memorialId": 4,
+      "title": "Quem foi Joaquim Nabuco, abolicionista que defendia a monarquia",
+      "description": "Matéria sobre a trajetória de Nabuco, sua amizade com Machado de Assis e como convenceu o Papa a apoiar o abolicionismo.",
+      "url": "https://guiadoestudante.abril.com.br/estudo/quem-foi-joaquim-nabuco-abolicionista-que-defendia-a-monarquia/",
+      "type": "news",
+      "source": "Guia do Estudante",
+      "date": "2023-09-15",
+      "order": 4,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 5,
+      "memorialId": 4,
+      "title": "Senadores reconhecem legado político de Joaquim Nabuco",
+      "description": "Sessão solene no Senado Federal em homenagem ao centenário da morte de Joaquim Nabuco, reconhecendo seu legado político.",
+      "url": "https://www12.senado.leg.br/noticias/materias/2010/05/12/senadores-reconhecem-legado-politico-de-joaquim-nabuco",
+      "type": "official",
+      "source": "Senado Federal",
+      "date": "2010-05-12",
+      "order": 5,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 6,
+      "memorialId": 4,
+      "title": "Fundação Joaquim Nabuco (Fundaj)",
+      "description": "Portal oficial da Fundação Joaquim Nabuco, instituição do MEC dedicada a preservar o legado histórico-cultural de Nabuco.",
+      "url": "https://www.gov.br/fundaj/pt-br",
+      "type": "institution",
+      "source": "Ministério da Educação",
+      "date": null,
+      "order": 6,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 7,
+      "memorialId": 4,
+      "title": "Engenho Massangana - Museu da Abolição",
+      "description": "Local onde Joaquim Nabuco passou a infância, tombado como Parque Nacional da Abolição. Fundamental para entender sua formação humanitária.",
+      "url": "https://visite.museus.gov.br/instituicoes/engenho-massangana/",
+      "type": "museum",
+      "source": "Visite Museus",
+      "date": null,
+      "order": 7,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 8,
+      "memorialId": 4,
+      "title": "O Abolicionismo (1883) - Obra Completa",
+      "description": "Livro seminal de Joaquim Nabuco que se tornou a principal referência teórica do movimento abolicionista brasileiro.",
+      "url": "https://each.usp.br/machado/soc/bibliot/machado/abolicionismo.htm",
+      "type": "book",
+      "source": "USP",
+      "date": "1883-01-01",
+      "order": 8,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 9,
+      "memorialId": 4,
+      "title": "Joaquim Nabuco: um defensor da liberdade no Brasil do século XIX",
+      "description": "Análise sobre como Nabuco defendeu temas incomuns para sua época, incluindo liberdade individual e direitos humanos.",
+      "url": "https://www.institutoliberal.org.br/blog/pensadores/joaquim-nabuco-um-defensor-da-liberdade-no-brasil-no-seculo-xix/",
+      "type": "article",
+      "source": "Instituto Liberal",
+      "date": "2025-08-19",
+      "order": 9,
+      "createdAt": "2024-12-28T00:00:00Z"
+    },
+    {
+      "id": 10,
+      "memorialId": 4,
+      "title": "Joaquim Aurelio Barreto Nabuco de Araújo - Britannica",
+      "description": "Verbete da Encyclopædia Britannica sobre o estadista e diplomata brasileiro, líder do movimento abolicionista.",
+      "url": "https://www.britannica.com/biography/Joaquim-Aurelio-Barreto-Nabuco-de-Araujo",
+      "type": "encyclopedia",
+      "source": "Britannica",
+      "date": null,
+      "order": 10,
+      "createdAt": "2024-12-28T00:00:00Z"
+    }
+  ]
+}
