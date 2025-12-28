@@ -44,7 +44,7 @@ export default function FuneralHomeDashboard() {
 
   const handleCreateMemorial = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Memorial criado com sucesso!");
+    toast.success("Memorial criado.");
     setShowCreateDialog(false);
     setFormData({
       fullName: "",
@@ -65,8 +65,37 @@ export default function FuneralHomeDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40">
+      {/* Mobile Header */}
+      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+              <QrCode className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-gray-900 text-sm">{APP_TITLE}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              size="sm"
+              className="btn-primary text-xs px-3 py-1"
+              onClick={() => setShowCreateDialog(true)}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-gray-600"
+              onClick={() => setLocation("/")}
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Sidebar - Hidden on mobile */}
+      <aside className="hidden md:block fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
@@ -118,11 +147,11 @@ export default function FuneralHomeDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="ml-64 p-8">
+      <main className="md:ml-64 p-4 sm:p-6 md:p-8 pt-16 md:pt-8">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
             <p className="text-gray-500">Gerencie seus memoriais digitais</p>
           </div>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -135,7 +164,7 @@ export default function FuneralHomeDashboard() {
             <DialogContent className="max-w-lg bg-white">
               <DialogHeader>
                 <DialogTitle className="text-xl">Criar Novo Memorial</DialogTitle>
-                <DialogDescription>Preencha as informações do falecido e contato da família</DialogDescription>
+                <DialogDescription>Insira as informações da pessoa homenageada e o e-mail de um familiar responsável.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleCreateMemorial} className="space-y-5 mt-4">
                 <div>
@@ -197,7 +226,7 @@ export default function FuneralHomeDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="card-modern p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 rounded-2xl bg-teal-100 flex items-center justify-center">
@@ -240,23 +269,23 @@ export default function FuneralHomeDashboard() {
         </div>
 
         {/* Memorials Section */}
-        <div className="card-modern p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Memoriais Recentes</h2>
-            <div className="flex items-center gap-4">
+        <div className="card-modern p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Memoriais Recentes</h2>
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
               {/* Search */}
-              <div className="relative">
+              <div className="relative flex-1 sm:flex-none">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Buscar memorial..."
+                  placeholder="Buscar..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all outline-none w-64"
+                  className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all outline-none w-full sm:w-48 md:w-64"
                 />
               </div>
               {/* View Toggle */}
-              <div className="flex bg-gray-100 rounded-lg p-1">
+              <div className="hidden sm:flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-md transition-colors ${viewMode === "grid" ? "bg-white shadow-sm" : "text-gray-500"}`}
@@ -274,7 +303,7 @@ export default function FuneralHomeDashboard() {
           </div>
 
           {viewMode === "grid" ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredMemorials.map((memorial, index) => (
                 <div 
                   key={memorial.id} 

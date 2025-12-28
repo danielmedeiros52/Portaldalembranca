@@ -47,7 +47,7 @@ export default function PublicMemorialPage() {
   }, [slug]);
 
   const handleSubmitDedication = () => {
-    toast.success("Dedicação enviada com sucesso!");
+    toast.success("Sua dedicação foi enviada.");
     setShowDedicationDialog(false);
     setDedicationForm({ authorName: "", message: "" });
   };
@@ -99,7 +99,7 @@ export default function PublicMemorialPage() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
         
         {/* Navigation */}
-        <nav className="relative z-10 px-6 py-4">
+        <nav className="relative z-10 px-4 sm:px-6 py-3 sm:py-4">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
             <button 
               onClick={() => setLocation("/")}
@@ -108,15 +108,15 @@ export default function PublicMemorialPage() {
               <ArrowLeft className="w-4 h-4" />
               Voltar
             </button>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button 
                 variant="ghost" 
                 size="sm"
                 className="text-white/80 hover:text-white hover:bg-white/10"
                 onClick={handleShare}
               >
-                <Share2 className="w-4 h-4 mr-2" />
-                Compartilhar
+                <Share2 className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Compartilhar</span>
               </Button>
               <Dialog open={showQRDialog} onOpenChange={setShowQRDialog}>
                 <DialogTrigger asChild>
@@ -125,8 +125,8 @@ export default function PublicMemorialPage() {
                     size="sm"
                     className="text-white/80 hover:text-white hover:bg-white/10"
                   >
-                    <QrCode className="w-4 h-4 mr-2" />
-                    QR Code
+                    <QrCode className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">QR Code</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-white max-w-sm">
@@ -157,17 +157,17 @@ export default function PublicMemorialPage() {
         </nav>
 
         {/* Hero Content */}
-        <div className="relative z-10 px-6 pb-32 pt-12">
+        <div className="relative z-10 px-4 sm:px-6 pb-24 sm:pb-32 pt-8 sm:pt-12">
           <div className="max-w-5xl mx-auto text-center">
             <div className="mb-6">
               <img 
                 src={memorial.mainPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(memorial.fullName)}&background=ffffff&color=0F766E&size=160`}
                 alt={memorial.fullName}
-                className="w-40 h-40 rounded-full mx-auto object-cover ring-4 ring-white shadow-2xl"
+                className="w-28 h-28 sm:w-40 sm:h-40 rounded-full mx-auto object-cover ring-4 ring-white shadow-2xl"
               />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{memorial.fullName}</h1>
-            <div className="flex items-center justify-center gap-6 text-white/80 mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">{memorial.fullName}</h1>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-white/80 mb-4 sm:mb-6 text-sm sm:text-base">
               <span className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 {formatDate(memorial.birthDate)} - {formatDate(memorial.deathDate)}
@@ -177,7 +177,7 @@ export default function PublicMemorialPage() {
                 {memorial.birthplace}
               </span>
             </div>
-            <p className="text-white/90 text-lg">{age} anos de vida</p>
+            <p className="text-white/90 text-base sm:text-lg">{age} anos de vida</p>
           </div>
         </div>
 
@@ -190,13 +190,13 @@ export default function PublicMemorialPage() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-6 -mt-8 pb-16">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 -mt-8 pb-12 sm:pb-16">
+        <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Biography */}
-            <section className="card-modern p-8 fade-in">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Biografia</h2>
+            <section className="card-modern p-5 sm:p-8 fade-in">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Biografia</h2>
               <div className="prose prose-gray max-w-none">
                 {memorial.biography.split('\n\n').map((paragraph, index) => (
                   <p key={index} className="text-gray-600 leading-relaxed mb-4">{paragraph}</p>
@@ -213,15 +213,15 @@ export default function PublicMemorialPage() {
 
             {/* Photo Gallery */}
             {photos.length > 0 && (
-              <section className="card-modern p-8 fade-in stagger-1">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <Image className="w-6 h-6 text-teal-600" />
+              <section className="card-modern p-5 sm:p-8 fade-in stagger-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <Image className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
                     Galeria de Fotos
                   </h2>
                   <span className="text-sm text-gray-500">{photos.length} fotos</span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
                   {photos.map((photo, index) => (
                     <button
                       key={photo.id}
@@ -243,24 +243,24 @@ export default function PublicMemorialPage() {
             )}
 
             {/* Dedications */}
-            <section className="card-modern p-8 fade-in stagger-2">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <Heart className="w-6 h-6 text-rose-500" />
-                  Dedicações
+            <section className="card-modern p-5 sm:p-8 fade-in stagger-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" />
+                  Homenagens
                 </h2>
                 <Dialog open={showDedicationDialog} onOpenChange={setShowDedicationDialog}>
                   <DialogTrigger asChild>
-                    <Button className="btn-secondary">
+                    <Button className="btn-secondary text-sm sm:text-base px-3 sm:px-6 py-2 sm:py-3 w-full sm:w-auto">
                       <Send className="w-4 h-4 mr-2" />
-                      Deixar Dedicação
+                      Enviar Homenagem
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="bg-white">
                     <DialogHeader>
-                      <DialogTitle>Deixar uma Dedicação</DialogTitle>
+                      <DialogTitle>Enviar uma Homenagem</DialogTitle>
                       <DialogDescription>
-                        Compartilhe uma mensagem em memória de {memorial.fullName}
+                        Compartilhe uma lembrança ou mensagem de carinho.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 mt-4">
@@ -323,7 +323,7 @@ export default function PublicMemorialPage() {
           <div className="space-y-6">
             {/* Descendants */}
             {descendants.length > 0 && (
-              <section className="card-modern p-6 fade-in stagger-3">
+              <section className="card-modern p-4 sm:p-6 fade-in stagger-3">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
                   <Users className="w-5 h-5 text-teal-600" />
                   Família
@@ -347,7 +347,7 @@ export default function PublicMemorialPage() {
             )}
 
             {/* QR Code Card */}
-            <section className="card-modern p-6 text-center fade-in stagger-4">
+            <section className="card-modern p-4 sm:p-6 text-center fade-in stagger-4">
               <div className="bg-gray-50 rounded-xl p-4 mb-4">
                 <img 
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}`}
@@ -360,7 +360,7 @@ export default function PublicMemorialPage() {
             </section>
 
             {/* Stats */}
-            <section className="card-modern p-6 fade-in stagger-5">
+            <section className="card-modern p-4 sm:p-6 fade-in stagger-5">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
                   <p className="text-2xl font-bold text-teal-600">{photos.length}</p>
@@ -394,13 +394,13 @@ export default function PublicMemorialPage() {
       )}
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 px-6">
+      <footer className="bg-gray-900 text-white py-6 sm:py-8 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <QrCode className="w-5 h-5 text-teal-400" />
             <span className="font-semibold">{APP_TITLE}</span>
           </div>
-          <p className="text-gray-400 text-sm">Preservando memórias para a eternidade</p>
+          <p className="text-gray-400 text-sm">Um lugar para recordar e homenagear.</p>
         </div>
       </footer>
     </div>

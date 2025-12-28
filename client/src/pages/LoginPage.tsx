@@ -42,10 +42,10 @@ export default function LoginPage() {
           </div>
           
           <h1 className="text-4xl font-bold text-white mb-6 leading-tight">
-            Preservando memórias<br />para a eternidade
+            Um lugar para recordar e homenagear.
           </h1>
           <p className="text-xl text-white/80 mb-8 max-w-md">
-            Acesse sua conta para gerenciar memoriais digitais e manter vivas as histórias de quem amamos.
+            Acesse sua conta para gerenciar os memoriais e manter vivas as histórias de quem partiu.
           </p>
 
           {/* Feature Pills */}
@@ -84,8 +84,8 @@ export default function LoginPage() {
           </div>
 
           <div className="card-modern p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Bem-vindo de volta</h2>
-            <p className="text-gray-500 mb-8">Entre na sua conta para continuar</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Olá! Acesse sua conta</h2>
+            <p className="text-gray-500 mb-8">Preencha seus dados para acessar o portal.</p>
 
             <Tabs value={userType} onValueChange={(v) => setUserType(v as "funeral_home" | "family")}>
               <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 p-1 rounded-xl">
