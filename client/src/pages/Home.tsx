@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { APP_TITLE } from "@/const";
-import { Heart, QrCode, Users, Shield, Sparkles, ArrowRight, Star, X, Mail, User, Phone, CheckCircle } from "lucide-react";
+import { Heart, QrCode, Users, Shield, Sparkles, ArrowRight, Star, X, Mail, User, Phone, CheckCircle, Check, Image } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Home() {
@@ -180,60 +180,165 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Values Section */}
+      {/* Pricing Section */}
       <section className="py-12 sm:py-20 px-4 sm:px-6 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10 sm:mb-16 fade-in">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Nossos Valores</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Nossos Planos</h2>
             <div className="section-divider mb-6"></div>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-              Princípios que guiam nossa missão de preservar memórias com respeito e tecnologia
+              Escolha o plano ideal para preservar as memórias de quem você ama
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {/* Value 1 */}
-            <div className="card-modern p-6 text-center fade-in stagger-1">
-              <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-teal-600" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+            {/* Plan 1 - Essencial */}
+            <div className="card-modern p-6 fade-in stagger-1">
+              <div className="text-center mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-teal-100 flex items-center justify-center mx-auto mb-4">
+                  <Heart className="w-7 h-7 text-teal-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Memorial Essencial</h3>
+                <p className="text-sm text-gray-500 mb-4">Ideal para preservar memórias de forma simples e acessível</p>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-3xl font-bold text-gray-900">R$ 19,90</span>
+                  <span className="text-gray-500 text-sm">/ano</span>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Sensibilidade</h3>
-              <p className="text-gray-600 text-sm">
-                Tratamos cada memorial com o cuidado e respeito que a memória de um ente querido merece.
-              </p>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Página memorial personalizada
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Até 10 fotos
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Biografia completa
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  QR Code digital
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Compartilhamento ilimitado
+                </li>
+              </ul>
+              <Button 
+                onClick={() => setLocation("/checkout")}
+                variant="outline"
+                className="w-full btn-outline"
+              >
+                Começar Agora
+              </Button>
             </div>
 
-            {/* Value 2 */}
-            <div className="card-modern p-6 text-center fade-in stagger-2">
-              <div className="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-rose-600" />
+            {/* Plan 2 - Premium (Popular) */}
+            <div className="card-modern p-6 fade-in stagger-2 relative border-2 border-teal-600 sm:-mt-4 sm:mb-4">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-teal-600 text-white text-xs font-medium rounded-full flex items-center gap-1">
+                <Star className="w-3 h-3" />
+                Mais Popular
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Confiança</h3>
-              <p className="text-gray-600 text-sm">
-                Garantimos a segurança e privacidade das informações e memórias compartilhadas.
-              </p>
+              <div className="text-center mb-6">
+                <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Memorial Premium</h3>
+                <p className="text-sm text-gray-500 mb-4">Recursos completos com placa física para homenagens especiais</p>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-3xl font-bold text-gray-900">R$ 99,90</span>
+                  <span className="text-gray-500 text-sm">/ano</span>
+                </div>
+                <p className="text-xs text-emerald-600 mt-2 font-medium">
+                  A partir do 2º ano: R$ 29,90/ano
+                </p>
+              </div>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Tudo do plano Essencial
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Fotos ilimitadas
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Galeria de vídeos
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Árvore genealógica
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  <strong>Placa física com QR Code</strong>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Suporte prioritário
+                </li>
+              </ul>
+              <Button 
+                onClick={() => setLocation("/checkout")}
+                className="w-full btn-primary"
+              >
+                Escolher Premium
+              </Button>
             </div>
 
-            {/* Value 3 */}
-            <div className="card-modern p-6 text-center fade-in stagger-3">
-              <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-amber-600" />
+            {/* Plan 3 - Família */}
+            <div className="card-modern p-6 fade-in stagger-3">
+              <div className="text-center mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-7 h-7 text-rose-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Plano Família</h3>
+                <p className="text-sm text-gray-500 mb-4">Para famílias que desejam preservar múltiplas memórias</p>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-3xl font-bold text-gray-900">R$ 249,90</span>
+                  <span className="text-gray-500 text-sm">/ano</span>
+                </div>
+                <p className="text-xs text-emerald-600 mt-2 font-medium">
+                  A partir do 2º ano: R$ 59,90/ano
+                </p>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Inovação</h3>
-              <p className="text-gray-600 text-sm">
-                Utilizamos tecnologia de ponta para criar experiências memoriais únicas e duradouras.
-              </p>
-            </div>
-
-            {/* Value 4 */}
-            <div className="card-modern p-6 text-center fade-in stagger-4">
-              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-cyan-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Comunidade</h3>
-              <p className="text-gray-600 text-sm">
-                Conectamos famílias e comunidades através de histórias e legados compartilhados.
-              </p>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Até 5 memoriais completos
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Árvore genealógica conectada
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Backup em nuvem
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Domínio personalizado
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  <strong>5 placas físicas com QR Code</strong>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-600">
+                  <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                  Suporte VIP 24/7
+                </li>
+              </ul>
+              <Button 
+                onClick={() => setLocation("/checkout")}
+                variant="outline"
+                className="w-full btn-outline"
+              >
+                Escolher Família
+              </Button>
             </div>
           </div>
         </div>
