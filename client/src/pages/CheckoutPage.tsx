@@ -63,12 +63,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (selectedPlan.price === 0) {
-      toast.success("Plano gratuito ativado com sucesso!");
-      setLocation("/dashboard/family");
-      return;
-    }
-
     setStep("payment");
   };
 
@@ -263,7 +257,7 @@ export default function CheckoutPage() {
         {/* Progress Steps */}
         <div className="flex items-center justify-center gap-4 mb-8">
           <div className={`flex items-center gap-2 ${step === "plan" ? "text-teal-600" : "text-gray-400"}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step === "plan" ? "bg-teal-600 text-white" : step !== "plan" ? "bg-teal-600 text-white" : "bg-gray-200"}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step === "plan" ? "bg-teal-600 text-white" : "bg-teal-600 text-white"}`}>
               {step !== "plan" ? <Check className="w-4 h-4" /> : "1"}
             </div>
             <span className="hidden sm:inline font-medium">Escolher Plano</span>
@@ -319,14 +313,17 @@ export default function CheckoutPage() {
                     <p className="text-sm text-gray-500 mb-4">{plan.description}</p>
                     <div className="flex items-baseline justify-center gap-1">
                       <span className="text-3xl font-bold text-gray-900">
-                        {plan.price === 0 ? "Grátis" : paymentService.formatPrice(plan.price)}
+                        {paymentService.formatPrice(plan.price)}
                       </span>
-                      {plan.price > 0 && (
-                        <span className="text-gray-500 text-sm">
-                          /{plan.interval === "month" ? "mês" : plan.interval === "year" ? "ano" : "único"}
-                        </span>
-                      )}
+                      <span className="text-gray-500 text-sm">
+                        /{plan.interval === "month" ? "mês" : plan.interval === "year" ? "ano" : "único"}
+                      </span>
                     </div>
+                    {plan.renewalPrice && plan.renewalPrice !== plan.price && (
+                      <p className="text-xs text-emerald-600 mt-2 font-medium">
+                        A partir do 2º ano: {paymentService.formatPrice(plan.renewalPrice)}/ano
+                      </p>
+                    )}
                   </div>
 
                   <ul className="space-y-3 mb-6">
@@ -355,7 +352,7 @@ export default function CheckoutPage() {
                 onClick={handleContinueToPayment}
                 disabled={!selectedPlan}
               >
-                {selectedPlan?.price === 0 ? "Ativar Plano Gratuito" : "Continuar para Pagamento"}
+Continuar para Pagamento
               </Button>
             </div>
           </div>

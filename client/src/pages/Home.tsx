@@ -1,10 +1,53 @@
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { APP_TITLE } from "@/const";
-import { Heart, QrCode, Users, Shield, Sparkles, ArrowRight, Star } from "lucide-react";
+import { Heart, QrCode, Users, Shield, Sparkles, ArrowRight, Star, X, Mail, User, Phone, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteForm, setInviteForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    acceptEmails: false
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inviteSuccess, setInviteSuccess] = useState(false);
+
+  const handleInviteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!inviteForm.name.trim()) {
+      toast.error("Por favor, informe seu nome.");
+      return;
+    }
+    if (!inviteForm.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteForm.email)) {
+      toast.error("Por favor, informe um e-mail válido.");
+      return;
+    }
+    if (!inviteForm.acceptEmails) {
+      toast.error("Você precisa autorizar o recebimento de e-mails para continuar.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Simula envio para API
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsSubmitting(false);
+    setInviteSuccess(true);
+    toast.success("Solicitação enviada com sucesso!");
+  };
+
+  const closeModal = () => {
+    setShowInviteModal(false);
+    setInviteSuccess(false);
+    setInviteForm({ name: "", email: "", phone: "", acceptEmails: false });
+  };
 
   return (
     <div className="min-h-screen bg-white overflow-hidden">
@@ -137,6 +180,65 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Values Section */}
+      <section className="py-12 sm:py-20 px-4 sm:px-6 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-10 sm:mb-16 fade-in">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Nossos Valores</h2>
+            <div className="section-divider mb-6"></div>
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+              Princípios que guiam nossa missão de preservar memórias com respeito e tecnologia
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            {/* Value 1 */}
+            <div className="card-modern p-6 text-center fade-in stagger-1">
+              <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-teal-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Sensibilidade</h3>
+              <p className="text-gray-600 text-sm">
+                Tratamos cada memorial com o cuidado e respeito que a memória de um ente querido merece.
+              </p>
+            </div>
+
+            {/* Value 2 */}
+            <div className="card-modern p-6 text-center fade-in stagger-2">
+              <div className="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-rose-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Confiança</h3>
+              <p className="text-gray-600 text-sm">
+                Garantimos a segurança e privacidade das informações e memórias compartilhadas.
+              </p>
+            </div>
+
+            {/* Value 3 */}
+            <div className="card-modern p-6 text-center fade-in stagger-3">
+              <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8 text-amber-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Inovação</h3>
+              <p className="text-gray-600 text-sm">
+                Utilizamos tecnologia de ponta para criar experiências memoriais únicas e duradouras.
+              </p>
+            </div>
+
+            {/* Value 4 */}
+            <div className="card-modern p-6 text-center fade-in stagger-4">
+              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-cyan-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Comunidade</h3>
+              <p className="text-gray-600 text-sm">
+                Conectamos famílias e comunidades através de histórias e legados compartilhados.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-12 sm:py-20 px-4 sm:px-6 gradient-subtle">
         <div className="max-w-7xl mx-auto">
@@ -144,11 +246,11 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Como Funciona</h2>
             <div className="section-divider mb-6"></div>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-              Uma solução completa para funerárias, famílias e acervos históricos criarem memoriais digitais significativos
+              Uma solução completa para funerárias e famílias criarem memoriais digitais significativos
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
             {/* Feature 1 */}
             <div className="card-modern p-5 sm:p-8 fade-in stagger-1">
               <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mb-6">
@@ -204,34 +306,6 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-
-            {/* Feature 3 */}
-            <div className="card-modern p-5 sm:p-8 fade-in stagger-3">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-cyan-600 to-cyan-500 flex items-center justify-center mb-6">
-                <Heart className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Para Patrimônio</h3>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-start gap-2">
-                  <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center mt-0.5">
-                    <div className="w-2 h-2 rounded-full bg-cyan-600"></div>
-                  </div>
-                  Mapeie túmulos de relevância histórica e cultural
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center mt-0.5">
-                    <div className="w-2 h-2 rounded-full bg-cyan-600"></div>
-                  </div>
-                  Disponibilize QR Codes para acervo público e visitas guiadas
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center mt-0.5">
-                    <div className="w-2 h-2 rounded-full bg-cyan-600"></div>
-                  </div>
-                  Baseie roteiros educativos e turismo de memória em dados confiáveis
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
       </section>
@@ -244,7 +318,7 @@ export default function Home() {
             <div className="section-divider"></div>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
             {/* Testimonial 1 */}
             <div className="card-modern p-6 fade-in stagger-1">
               <div className="flex gap-1 mb-4">
@@ -290,29 +364,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-
-            {/* Testimonial 3 */}
-            <div className="card-modern p-6 fade-in stagger-3">
-              <div className="flex gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="text-gray-600 mb-6">
-                "Estamos catalogando túmulos históricos do Recife e colocando QR Codes para quem visita. O acervo online virou referência para roteiros educativos." 
-              </p>
-              <div className="flex items-center gap-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=face"
-                  alt="Mariana"
-                  className="w-12 h-12 avatar"
-                />
-                <div>
-                  <p className="font-medium text-gray-900">Mariana Costa</p>
-                  <p className="text-sm text-gray-500">Visitante</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -332,7 +383,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Button
-                  onClick={() => setLocation("/login")}
+                  onClick={() => setShowInviteModal(true)}
                   className="bg-white text-teal-700 font-semibold px-4 sm:px-8 py-3 sm:py-4 rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-lg text-sm sm:text-base"
                 >
                   Solicite um convite
@@ -372,6 +423,135 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={closeModal}
+          ></div>
+          
+          {/* Modal */}
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 fade-in">
+            {/* Close Button */}
+            <button 
+              onClick={closeModal}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+
+            {!inviteSuccess ? (
+              <>
+                {/* Header */}
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4">
+                    <Mail className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Solicite um Convite</h3>
+                  <p className="text-gray-600">
+                    Preencha seus dados para receber acesso ao Portal da Lembrança
+                  </p>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleInviteSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nome completo</label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Seu nome"
+                        value={inviteForm.name}
+                        onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
+                        className="input-modern pl-12"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={inviteForm.email}
+                        onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
+                        className="input-modern pl-12"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Telefone (opcional)</label>
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="tel"
+                        placeholder="(00) 00000-0000"
+                        value={inviteForm.phone}
+                        onChange={(e) => setInviteForm({ ...inviteForm, phone: e.target.value })}
+                        className="input-modern pl-12"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={inviteForm.acceptEmails}
+                        onChange={(e) => setInviteForm({ ...inviteForm, acceptEmails: e.target.checked })}
+                        className="w-5 h-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 mt-0.5"
+                        disabled={isSubmitting}
+                      />
+                      <span className="text-sm text-gray-600">
+                        Autorizo o recebimento de e-mails do Portal da Lembrança com novidades, atualizações e informações sobre o serviço.
+                      </span>
+                    </label>
+                  </div>
+
+                  <Button 
+                    type="submit"
+                    className="w-full btn-primary py-3"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Enviando..." : "Solicitar Convite"}
+                  </Button>
+                </form>
+
+                <p className="text-xs text-gray-500 text-center mt-4">
+                  Seus dados estão protegidos conforme nossa política de privacidade.
+                </p>
+              </>
+            ) : (
+              /* Success State */
+              <div className="text-center py-4">
+                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-10 h-10 text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Solicitação Enviada!</h3>
+                <p className="text-gray-600 mb-6">
+                  Obrigado pelo interesse! Entraremos em contato em breve através do e-mail informado.
+                </p>
+                <Button 
+                  onClick={closeModal}
+                  className="btn-primary px-8"
+                >
+                  Fechar
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
