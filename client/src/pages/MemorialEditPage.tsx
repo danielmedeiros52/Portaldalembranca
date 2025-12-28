@@ -65,17 +65,17 @@ export default function MemorialEditPage() {
   }, [memorialId]);
 
   const handleSave = async () => {
-    toast.success("Memorial atualizado com sucesso!");
+    toast.success("Memorial atualizado.");
   };
 
   const handleAddDescendant = () => {
-    toast.success("Descendente adicionado com sucesso!");
+    toast.success("Familiar adicionado.");
     setShowAddDescendant(false);
     setDescendantForm({ name: "", relationship: "" });
   };
 
   const handleAddPhoto = () => {
-    toast.success("Foto adicionada com sucesso!");
+    toast.success("Foto adicionada.");
     setShowAddPhoto(false);
   };
 
@@ -95,7 +95,7 @@ export default function MemorialEditPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-6 py-4">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button 
@@ -105,7 +105,7 @@ export default function MemorialEditPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Editar Memorial</h1>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">Editar Memorial</h1>
                 <p className="text-sm text-gray-500">{memorial.fullName}</p>
               </div>
             </div>
@@ -117,15 +117,15 @@ export default function MemorialEditPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Memorial Header Card */}
-        <div className="card-modern p-6 mb-8">
-          <div className="flex items-start gap-6">
+        <div className="card-modern p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             <div className="relative group">
               <img 
                 src={memorial.mainPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(memorial.fullName)}&background=0F766E&color=fff&size=128`}
                 alt={memorial.fullName}
-                className="w-32 h-32 rounded-2xl object-cover"
+                className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl object-cover"
               />
               <button className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <Upload className="w-6 h-6 text-white" />
@@ -153,30 +153,34 @@ export default function MemorialEditPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white p-1 rounded-xl shadow-sm border border-gray-100">
-            <TabsTrigger value="info" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700">
-              <User className="w-4 h-4" />
-              Informações
+          <TabsList className="bg-white p-1 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-1">
+            <TabsTrigger value="info" className="flex items-center gap-1 sm:gap-2 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700 text-xs sm:text-sm px-2 sm:px-3">
+              <User className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Info</span>
+              <span className="hidden sm:inline">rmações</span>
             </TabsTrigger>
-            <TabsTrigger value="descendants" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700">
-              <Users className="w-4 h-4" />
-              Descendentes ({descendants.length})
+            <TabsTrigger value="descendants" className="flex items-center gap-1 sm:gap-2 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700 text-xs sm:text-sm px-2 sm:px-3">
+              <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span>Família</span>
+              <span className="hidden sm:inline">res ({descendants.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="photos" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700">
-              <Image className="w-4 h-4" />
-              Fotos ({photos.length})
+            <TabsTrigger value="photos" className="flex items-center gap-1 sm:gap-2 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700 text-xs sm:text-sm px-2 sm:px-3">
+              <Image className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span>Fotos</span>
+              <span className="hidden sm:inline"> ({photos.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="dedications" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700">
-              <MessageSquare className="w-4 h-4" />
-              Dedicações ({dedications.length})
+            <TabsTrigger value="dedications" className="flex items-center gap-1 sm:gap-2 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700 text-xs sm:text-sm px-2 sm:px-3">
+              <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Homen</span>
+              <span className="hidden sm:inline">agens ({dedications.length})</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Info Tab */}
           <TabsContent value="info">
-            <div className="card-modern p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Informações Pessoais</h3>
-              <div className="grid md:grid-cols-2 gap-6">
+            <div className="card-modern p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Informações Pessoais</h3>
+              <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
                   <input
@@ -238,7 +242,7 @@ export default function MemorialEditPage() {
           <TabsContent value="descendants">
             <div className="card-modern p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Descendentes</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Familiares</h3>
                 <Dialog open={showAddDescendant} onOpenChange={setShowAddDescendant}>
                   <DialogTrigger asChild>
                     <Button className="btn-primary">
@@ -248,8 +252,8 @@ export default function MemorialEditPage() {
                   </DialogTrigger>
                   <DialogContent className="bg-white">
                     <DialogHeader>
-                      <DialogTitle>Adicionar Descendente</DialogTitle>
-                      <DialogDescription>Adicione um familiar ao memorial</DialogDescription>
+                      <DialogTitle>Adicionar Familiar</DialogTitle>
+                      <DialogDescription>Adicione um membro da família ao memorial</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 mt-4">
                       <div>
@@ -278,7 +282,7 @@ export default function MemorialEditPage() {
                         </select>
                       </div>
                       <Button onClick={handleAddDescendant} className="w-full btn-primary">
-                        Adicionar Descendente
+                        Adicionar Familiar
                       </Button>
                     </div>
                   </DialogContent>

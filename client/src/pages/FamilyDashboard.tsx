@@ -49,8 +49,28 @@ export default function FamilyDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40">
+      {/* Mobile Header */}
+      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg gradient-secondary flex items-center justify-center">
+              <Heart className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-gray-900 text-sm">{APP_TITLE}</span>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="text-gray-600"
+            onClick={() => setLocation("/")}
+          >
+            <LogOut className="w-4 h-4" />
+          </Button>
+        </div>
+      </header>
+
+      {/* Sidebar - Hidden on mobile */}
+      <aside className="hidden md:block fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl gradient-secondary flex items-center justify-center">
@@ -104,15 +124,15 @@ export default function FamilyDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="ml-64 p-8">
+      <main className="md:ml-64 p-4 sm:p-6 md:p-8 pt-16 md:pt-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Olá, {familyUser?.name?.split(' ')[0]}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Olá, {familyUser?.name?.split(' ')[0]}</h1>
           <p className="text-gray-500">Gerencie os memoriais da sua família</p>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="card-modern p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center">
@@ -148,7 +168,7 @@ export default function FamilyDashboard() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Memorials */}
           <div className="lg:col-span-2">
             <div className="card-modern p-6">

@@ -10,24 +10,24 @@ export default function Home() {
     <div className="min-h-screen bg-white overflow-hidden">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.3)' }}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-              <QrCode className="w-5 h-5 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl gradient-primary flex items-center justify-center">
+              <QrCode className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">{APP_TITLE}</span>
+            <span className="text-lg sm:text-xl font-bold text-gray-900">{APP_TITLE}</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button 
               variant="ghost" 
-              className="text-gray-600 hover:text-teal-700"
+              className="hidden sm:inline-flex text-gray-600 hover:text-teal-700"
               onClick={() => setLocation("/m/maria-silva-santos")}
             >
               Ver Demo
             </Button>
             <Button 
               onClick={() => setLocation("/login")} 
-              className="btn-primary"
+              className="btn-primary text-sm sm:text-base px-3 sm:px-6 py-2 sm:py-3"
             >
               Entrar
             </Button>
@@ -36,34 +36,33 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6">
+      <section className="relative pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6">
         {/* Background Decorations */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float"></div>
         <div className="absolute top-40 right-10 w-72 h-72 bg-rose-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float" style={{ animationDelay: '2s' }}></div>
         <div className="absolute bottom-20 left-1/3 w-72 h-72 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float" style={{ animationDelay: '4s' }}></div>
 
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
             <div className="fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 rounded-full text-teal-700 text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
               Versão piloto em Pernambuco
             </div>
-            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-              Honre memórias com{" "}
-              <span className="text-gradient">tecnologia</span> e cuidado{" "}
-              <span className="text-gradient-rose">local</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4 sm:mb-6">
+              Preserve memórias com{" "}
+              <span className="text-gradient">tecnologia</span> e sensibilidade
             </h1>
-            <p className="text-xl text-gray-600 leading-relaxed mb-8">
-              Memoriais digitais com QR Code no túmulo, preparados para o dia a dia das funerárias pernambucanas e para famílias que querem preservar histórias em um ambiente seguro e perene.
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed mb-6 sm:mb-8">
+              Crie memoriais digitais para preservar as histórias de quem você ama. Uma solução sensível e duradoura, desenvolvida em Pernambuco para as famílias e funerárias locais.
             </p>
               <div className="flex flex-wrap gap-4">
                 <Button 
                   onClick={() => setLocation("/login")} 
                   className="btn-primary inline-flex items-center gap-2"
                 >
-                  Começar Agora
+                  Criar Memorial
                   <ArrowRight className="w-4 h-4" />
                 </Button>
                 <Button 
@@ -76,24 +75,24 @@ export default function Home() {
               </div>
 
               {/* Stats */}
-              <div className="flex gap-8 mt-12 pt-8 border-t border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-100">
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">15 min</p>
-                  <p className="text-sm text-gray-500">Tempo médio para ativar um memorial</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900">15 min</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Tempo médio para ativar um memorial</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">4 parceiros</p>
-                  <p className="text-sm text-gray-500">Funerárias e cemitérios em Recife/RMR</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900">4 parceiros</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Funerárias e cemitérios em Recife/RMR</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">Placa + QR</p>
-                  <p className="text-sm text-gray-500">Entrega pronta para ser fixada no túmulo</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900">Placa + QR</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Entrega pronta para ser fixada no túmulo</p>
                 </div>
               </div>
             </div>
 
             {/* Right Content - Hero Image/Card */}
-            <div className="relative fade-in stagger-2">
+            <div className="relative fade-in stagger-2 hidden md:block">
               <div className="relative">
                 {/* Main Card */}
                 <div className="card-modern p-6 max-w-md mx-auto">
@@ -139,19 +138,19 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 gradient-subtle">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 gradient-subtle">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 fade-in">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Como Funciona</h2>
+          <div className="text-center mb-10 sm:mb-16 fade-in">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Como Funciona</h2>
             <div className="section-divider mb-6"></div>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
               Uma solução completa para funerárias, famílias e acervos históricos criarem memoriais digitais significativos
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             {/* Feature 1 */}
-            <div className="card-modern p-8 fade-in stagger-1">
+            <div className="card-modern p-5 sm:p-8 fade-in stagger-1">
               <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mb-6">
                 <QrCode className="w-7 h-7 text-white" />
               </div>
@@ -179,7 +178,7 @@ export default function Home() {
             </div>
 
             {/* Feature 2 */}
-            <div className="card-modern p-8 fade-in stagger-2">
+            <div className="card-modern p-5 sm:p-8 fade-in stagger-2">
               <div className="w-14 h-14 rounded-2xl gradient-secondary flex items-center justify-center mb-6">
                 <Users className="w-7 h-7 text-white" />
               </div>
@@ -207,7 +206,7 @@ export default function Home() {
             </div>
 
             {/* Feature 3 */}
-            <div className="card-modern p-8 fade-in stagger-3">
+            <div className="card-modern p-5 sm:p-8 fade-in stagger-3">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-cyan-600 to-cyan-500 flex items-center justify-center mb-6">
                 <Heart className="w-7 h-7 text-white" />
               </div>
@@ -238,14 +237,14 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-6">
+      <section className="py-12 sm:py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">O Que Dizem Nossos Clientes</h2>
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Depoimentos</h2>
             <div className="section-divider"></div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Testimonial 1 */}
             <div className="card-modern p-6 fade-in stagger-1">
               <div className="flex gap-1 mb-4">
@@ -319,29 +318,29 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6">
+      <section className="py-12 sm:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="relative gradient-hero rounded-3xl p-12 text-center overflow-hidden">
+          <div className="relative gradient-hero rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center overflow-hidden">
             {/* Decorative Elements */}
             <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3"></div>
             
             <div className="relative z-10">
-              <h2 className="text-4xl font-bold text-white mb-4">Pronto para pilotar?</h2>
-              <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">Conheça o Portal da Lembrança</h2>
+              <p className="text-base sm:text-lg md:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto">
                 Conecte sua funerária ou família ao Portal da Lembrança em Pernambuco e valide a experiência com QR Codes, placas físicas e suporte dedicado.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Button
                   onClick={() => setLocation("/login")}
-                  className="bg-white text-teal-700 font-semibold px-8 py-4 rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-lg"
+                  className="bg-white text-teal-700 font-semibold px-4 sm:px-8 py-3 sm:py-4 rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-lg text-sm sm:text-base"
                 >
-                  Solicitar acesso ao piloto
+                  Solicite um convite
                 </Button>
                 <Button 
                   onClick={() => setLocation("/m/maria-silva-santos")}
                   variant="outline"
-                  className="border-2 border-white text-white font-semibold px-8 py-4 rounded-xl hover:bg-white/10 transition-all duration-300"
+                  className="border-2 border-white text-white font-semibold px-4 sm:px-8 py-3 sm:py-4 rounded-xl hover:bg-white/10 transition-all duration-300 text-sm sm:text-base"
                 >
                   Ver Demonstração
                 </Button>
@@ -352,7 +351,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-6">
+      <footer className="bg-gray-900 text-white py-8 sm:py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
@@ -361,7 +360,7 @@ export default function Home() {
               </div>
               <span className="text-xl font-bold">{APP_TITLE}</span>
             </div>
-            <div className="flex items-center gap-6 text-gray-400">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-gray-400 text-sm sm:text-base">
               <a href="#" className="hover:text-white transition-colors">Sobre</a>
               <a href="#" className="hover:text-white transition-colors">Contato</a>
               <a href="#" className="hover:text-white transition-colors">Privacidade</a>
