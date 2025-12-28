@@ -16,11 +16,13 @@ export interface Plan {
   name: string;
   description: string;
   price: number;
+  renewalPrice?: number; // Preço de renovação (a partir do 2º ano)
   currency: string;
   interval: 'month' | 'year' | 'one_time';
   features: string[];
   popular?: boolean;
   stripePriceId?: string; // For Stripe integration
+  hasPlate?: boolean; // Indica se o plano inclui placa física
 }
 
 export interface PaymentMethod {
@@ -37,6 +39,7 @@ export interface CreatePaymentIntentData {
   planId: string;
   paymentMethodType: 'card' | 'pix' | 'boleto';
   memorialId?: number;
+  isRenewal?: boolean; // Indica se é renovação
 }
 
 export interface PaymentIntent {
@@ -81,50 +84,58 @@ export interface CardData {
 // Simulated delay to mimic API latency
 const simulateDelay = (ms: number = 800) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Available plans
+// Available plans - Nova estrutura de preços
 const PLANS: Plan[] = [
   {
-    id: 'basic',
-    name: 'Memorial Básico',
-    description: 'Ideal para preservar memórias essenciais',
-    price: 0,
+    id: 'essencial',
+    name: 'Memorial Essencial',
+    description: 'Ideal para preservar memórias de forma simples e acessível',
+    price: 19.90,
+    renewalPrice: 19.90, // Mesmo preço na renovação
     currency: 'BRL',
-    interval: 'one_time',
+    interval: 'year',
+    stripePriceId: 'price_essencial_annual',
+    hasPlate: false,
     features: [
       'Página memorial personalizada',
-      'Até 5 fotos',
-      'Biografia básica',
+      'Até 10 fotos',
+      'Biografia completa',
       'QR Code digital',
-      'Compartilhamento em redes sociais'
+      'Compartilhamento em redes sociais',
+      'Dedicações ilimitadas'
     ]
   },
   {
     id: 'premium',
     name: 'Memorial Premium',
-    description: 'Recursos completos para homenagens especiais',
+    description: 'Recursos completos com placa física para homenagens especiais',
     price: 99.90,
+    renewalPrice: 29.90, // Preço reduzido a partir do 2º ano (sem custo da placa)
     currency: 'BRL',
-    interval: 'one_time',
+    interval: 'year',
     popular: true,
-    stripePriceId: 'price_premium_memorial',
+    stripePriceId: 'price_premium_annual',
+    hasPlate: true,
     features: [
-      'Tudo do plano Básico',
+      'Tudo do plano Essencial',
       'Fotos ilimitadas',
       'Galeria de vídeos',
       'Árvore genealógica',
-      'Dedicações ilimitadas',
       'Placa física com QR Code',
-      'Suporte prioritário'
+      'Suporte prioritário',
+      'Renovação por apenas R$ 29,90/ano'
     ]
   },
   {
-    id: 'family',
+    id: 'familia',
     name: 'Plano Família',
     description: 'Para famílias que desejam preservar múltiplas memórias',
     price: 249.90,
+    renewalPrice: 59.90, // Preço reduzido a partir do 2º ano (sem custo das placas)
     currency: 'BRL',
     interval: 'year',
-    stripePriceId: 'price_family_annual',
+    stripePriceId: 'price_familia_annual',
+    hasPlate: true,
     features: [
       'Até 5 memoriais Premium',
       'Fotos e vídeos ilimitados',
@@ -132,7 +143,8 @@ const PLANS: Plan[] = [
       'Backup em nuvem',
       'Domínio personalizado',
       '5 placas físicas com QR Code',
-      'Suporte VIP 24/7'
+      'Suporte VIP 24/7',
+      'Renovação por apenas R$ 59,90/ano'
     ]
   }
 ];
@@ -157,6 +169,13 @@ class PaymentService {
   async getPlanById(planId: string): Promise<Plan | undefined> {
     const plans = await this.getPlans();
     return plans.find(p => p.id === planId);
+  }
+
+  /**
+   * Get renewal price for a plan
+   */
+  getRenewalPrice(plan: Plan): number {
+    return plan.renewalPrice ?? plan.price;
   }
 
   /**
@@ -188,10 +207,13 @@ class PaymentService {
       };
     }
 
+    // Usa preço de renovação se for renovação
+    const amount = data.isRenewal ? this.getRenewalPrice(plan) : plan.price;
+
     const paymentIntent: PaymentIntent = {
       id: 'pi_mock_' + Date.now(),
       clientSecret: 'pi_mock_secret_' + Date.now(),
-      amount: plan.price * 100, // Stripe uses cents
+      amount: amount * 100, // Stripe uses cents
       currency: plan.currency.toLowerCase(),
       status: 'requires_payment_method',
       paymentMethodType: data.paymentMethodType
@@ -380,6 +402,16 @@ class PaymentService {
       style: 'currency',
       currency: currency
     }).format(amount);
+  }
+
+  /**
+   * Format renewal info for display
+   */
+  formatRenewalInfo(plan: Plan): string | null {
+    if (!plan.renewalPrice || plan.renewalPrice === plan.price) {
+      return null;
+    }
+    return `Renovação por apenas ${this.formatPrice(plan.renewalPrice)}/ano`;
   }
 
   /**
