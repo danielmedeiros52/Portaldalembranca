@@ -400,7 +400,7 @@ export default function PublicMemorialPage() {
                       </div>
                       <Button onClick={handleSubmitDedication} className="w-full btn-secondary">
                         <Send className="w-4 h-4 mr-2" />
-                        Enviar Dedicação
+                        Enviar Homenagem
                       </Button>
                     </div>
                   </DialogContent>
