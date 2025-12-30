@@ -3,10 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { getDb } from "./db";
-import { funeralHomes, familyUsers, memorials, descendants, photos, dedications, InsertMemorial, InsertDescendant, InsertPhoto, InsertDedication } from "../drizzle/schema";
 import * as db from "./db";
-import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { generateMemorialQRCode, generateMemorialQRCodeSVG } from "./qrcode";
@@ -60,15 +57,17 @@ const authRouter = router({
         throw new Error("E-mail já registrado");
       }
       const passwordHash = await bcrypt.hash(input.password, 10);
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
-      await dbInstance.insert(funeralHomes).values({
-        name: input.name,
-        email: input.email,
-        passwordHash,
-        phone: input.phone,
-        address: input.address,
+      await dbInstance.funeralHome.create({
+        data: {
+          name: input.name,
+          email: input.email,
+          passwordHash,
+          phone: input.phone,
+          address: input.address,
+        },
       });
 
       return { success: true };
@@ -108,15 +107,18 @@ const authRouter = router({
       }
 
       const passwordHash = await bcrypt.hash(input.password, 10);
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
-      await dbInstance.update(familyUsers).set({
-        passwordHash,
-        isActive: true,
-        invitationToken: null,
-        invitationExpiry: null,
-      }).where(eq(familyUsers.id, familyUser.id));
+      await dbInstance.familyUser.update({
+        where: { id: familyUser.id },
+        data: {
+          passwordHash,
+          isActive: true,
+          invitationToken: null,
+          invitationExpiry: null,
+        },
+      });
 
       return { success: true };
     }),
@@ -168,7 +170,7 @@ const memorialRouter = router({
       funeralHomeId: z.number(),
     }))
     .mutation(async ({ input }) => {
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
       // Get or create family user
@@ -179,12 +181,14 @@ const memorialRouter = router({
         const invitationToken = crypto.randomBytes(32).toString("hex");
         const invitationExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-        await dbInstance.insert(familyUsers).values({
-          name: input.familyEmail.split("@")[0],
-          email: input.familyEmail,
-          invitationToken,
-          invitationExpiry,
-          isActive: false,
+        await dbInstance.familyUser.create({
+          data: {
+            name: input.familyEmail.split("@")[0],
+            email: input.familyEmail,
+            invitationToken,
+            invitationExpiry,
+            isActive: false,
+          },
         });
 
         const newFamilyUser = await db.getFamilyUserByEmail(input.familyEmail);
@@ -195,16 +199,18 @@ const memorialRouter = router({
       }
 
       const slug = generateSlug(input.fullName);
-      await dbInstance.insert(memorials).values({
-        slug,
-        fullName: input.fullName,
-        birthDate: input.birthDate,
-        deathDate: input.deathDate,
-        birthplace: input.birthplace,
-        funeralHomeId: input.funeralHomeId,
-        familyUserId,
-        status: "pending_data",
-        visibility: "public",
+      await dbInstance.memorial.create({
+        data: {
+          slug,
+          fullName: input.fullName,
+          birthDate: input.birthDate,
+          deathDate: input.deathDate,
+          birthplace: input.birthplace,
+          funeralHomeId: input.funeralHomeId,
+          familyUserId,
+          status: "pending_data",
+          visibility: "public",
+        },
       });
 
       const createdMemorial = await db.getMemorialBySlug(slug);
@@ -225,11 +231,14 @@ const memorialRouter = router({
       status: z.enum(["active", "pending_data", "inactive"]).optional(),
     }))
     .mutation(async ({ input }) => {
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
       const { id, ...updateData } = input;
-      await dbInstance.update(memorials).set(updateData).where(eq(memorials.id, id));
+      await dbInstance.memorial.update({
+        where: { id },
+        data: db.buildMemorialUpdateData(updateData),
+      });
       return { success: true };
     }),
 
@@ -271,10 +280,10 @@ const descendantRouter = router({
       relationship: z.string().min(1),
     }))
     .mutation(async ({ input }) => {
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
-      await dbInstance.insert(descendants).values(input);
+      await dbInstance.descendant.create({ data: input });
       const created = await db.getDescendantsByMemorialId(input.memorialId);
       return { success: true, count: created.length };
     }),
@@ -282,10 +291,10 @@ const descendantRouter = router({
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
-      await dbInstance.delete(descendants).where(eq(descendants.id, input.id));
+      await dbInstance.descendant.delete({ where: { id: input.id } });
       return { success: true };
     }),
 });
@@ -306,12 +315,16 @@ const photoRouter = router({
       order: z.number().optional(),
     }))
     .mutation(async ({ input }) => {
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
-      await dbInstance.insert(photos).values({
-        ...input,
-        order: input.order ?? 0,
+      await dbInstance.photo.create({
+        data: {
+          memorialId: input.memorialId,
+          fileUrl: input.fileUrl,
+          caption: input.caption,
+          order: input.order ?? 0,
+        },
       });
       return { success: true };
     }),
@@ -319,10 +332,10 @@ const photoRouter = router({
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
-      await dbInstance.delete(photos).where(eq(photos.id, input.id));
+      await dbInstance.photo.delete({ where: { id: input.id } });
       return { success: true };
     }),
 });
@@ -342,10 +355,10 @@ const dedicationRouter = router({
       message: z.string().min(1),
     }))
     .mutation(async ({ input }) => {
-      const dbInstance = await getDb();
+      const dbInstance = await db.getDb();
       if (!dbInstance) throw new Error("Banco de dados não disponível");
 
-      await dbInstance.insert(dedications).values(input);
+      await dbInstance.dedication.create({ data: input });
       return { success: true };
     }),
 });

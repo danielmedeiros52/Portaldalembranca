@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum Visibility {
+  public
+  private
+}
+
+enum MemorialStatus {
+  active
+  pending_data
+  inactive
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  openId       String   @unique @db.VarChar(64)
+  name         String?
+  email        String?  @db.VarChar(320)
+  loginMethod  String?  @db.VarChar(64)
+  role         Role     @default(user)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  lastSignedIn DateTime @default(now())
+
+  @@map("users")
+}
+
+model FuneralHome {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(255)
+  email      String    @unique @db.VarChar(320)
+  passwordHash String  @map("password_hash") @db.VarChar(255)
+  phone      String?   @db.VarChar(20)
+  address    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+  memorials  Memorial[]
+
+  @@map("funeral_homes")
+}
+
+model FamilyUser {
+  id                Int        @id @default(autoincrement())
+  name              String     @db.VarChar(255)
+  email             String     @unique @db.VarChar(320)
+  passwordHash      String?    @map("password_hash") @db.VarChar(255)
+  phone             String?    @db.VarChar(20)
+  invitationToken   String?    @map("invitation_token") @db.VarChar(255)
+  invitationExpiry  DateTime?  @map("invitation_expiry")
+  isActive          Boolean    @default(false) @map("is_active")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @default(now()) @updatedAt
+  memorials         Memorial[]
+
+  @@map("family_users")
+}
+
+model Memorial {
+  id            Int              @id @default(autoincrement())
+  slug          String           @unique @db.VarChar(255)
+  fullName      String           @map("full_name") @db.VarChar(255)
+  birthDate     String?          @map("birth_date") @db.VarChar(10)
+  deathDate     String?          @map("death_date") @db.VarChar(10)
+  birthplace    String?          @db.VarChar(255)
+  filiation     String?
+  biography     String?
+  visibility    Visibility       @default(public)
+  status        MemorialStatus   @default(pending_data)
+  funeralHomeId Int              @map("funeral_home_id")
+  familyUserId  Int?             @map("family_user_id")
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @default(now()) @updatedAt
+  funeralHome   FuneralHome      @relation(fields: [funeralHomeId], references: [id])
+  familyUser    FamilyUser?      @relation(fields: [familyUserId], references: [id])
+  descendants   Descendant[]
+  photos        Photo[]
+  dedications   Dedication[]
+
+  @@map("memorials")
+}
+
+model Descendant {
+  id          Int       @id @default(autoincrement())
+  memorialId  Int       @map("memorial_id")
+  name        String    @db.VarChar(255)
+  relationship String   @db.VarChar(100)
+  createdAt   DateTime  @default(now())
+  memorial    Memorial  @relation(fields: [memorialId], references: [id])
+
+  @@map("descendants")
+}
+
+model Photo {
+  id         Int       @id @default(autoincrement())
+  memorialId Int       @map("memorial_id")
+  fileUrl    String    @map("file_url") @db.VarChar(500)
+  caption    String?
+  order      Int       @default(0)
+  createdAt  DateTime  @default(now())
+  memorial   Memorial  @relation(fields: [memorialId], references: [id])
+
+  @@map("photos")
+}
+
+model Dedication {
+  id         Int       @id @default(autoincrement())
+  memorialId Int       @map("memorial_id")
+  authorName String    @map("author_name") @db.VarChar(255)
+  message    String
+  createdAt  DateTime  @default(now())
+  memorial   Memorial  @relation(fields: [memorialId], references: [id])
+
+  @@map("dedications")
+}
