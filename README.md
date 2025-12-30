@@ -27,5 +27,6 @@ A integração com Stripe usa a variável `STRIPE_SECRET_KEY`. Em ambientes loca
 
 ## Desenvolvimento
 1. Instale dependências com `npm install`.
+2. Configure o `DATABASE_URL` em um arquivo `.env` e rode `npx prisma migrate dev --name init_portal_da_lembranca` para aplicar o schema.
 2. Rode `npm run dev` para acompanhar a API.
 3. Para produção, execute `npm run build` seguido de `npm start`.

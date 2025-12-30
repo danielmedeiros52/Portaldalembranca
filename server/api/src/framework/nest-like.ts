@@ -1,7 +1,7 @@
 import express, { json, Request, Response } from 'express';
 import http from 'http';
 
-type HttpMethod = 'get' | 'post';
+type HttpMethod = 'get' | 'post' | 'put' | 'delete';
 
 type RouteDefinition = {
   method: HttpMethod;
@@ -18,7 +18,9 @@ type ModuleMetadata = {
 const controllerMetadata = new WeakMap<object, { prefix: string }>();
 const moduleMetadata = new WeakMap<object, ModuleMetadata>();
 const routeMetadata = new WeakMap<object, RouteDefinition[]>();
-const parameterMetadata = new WeakMap<object, Map<string | symbol, Array<{ index: number; type: 'body' }>>>();
+type ParameterType = 'body' | 'req';
+
+const parameterMetadata = new WeakMap<object, Map<string | symbol, Array<{ index: number; type: ParameterType }>>>();
 
 export class Logger {
   constructor(private readonly context: string) {}
@@ -42,6 +44,15 @@ export class BadRequestException extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'BadRequestException';
+  }
+}
+
+export class NotFoundException extends Error {
+  public readonly status = 404;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'NotFoundException';
   }
 }
 
@@ -73,11 +84,31 @@ export function Post(path = '') {
     addRoute(target.constructor, { method: 'post', path, handlerName: String(propertyKey) });
 }
 
+export function Put(path = '') {
+  return (target: object, propertyKey: string | symbol) =>
+    addRoute(target.constructor, { method: 'put', path, handlerName: String(propertyKey) });
+}
+
+export function Delete(path = '') {
+  return (target: object, propertyKey: string | symbol) =>
+    addRoute(target.constructor, { method: 'delete', path, handlerName: String(propertyKey) });
+}
+
 export function Body() {
   return (target: object, propertyKey: string | symbol, parameterIndex: number) => {
     const params = parameterMetadata.get(target.constructor) ?? new Map();
     const descriptors = params.get(propertyKey) ?? [];
     descriptors.push({ index: parameterIndex, type: 'body' });
+    params.set(propertyKey, descriptors);
+    parameterMetadata.set(target.constructor, params);
+  };
+}
+
+export function Req() {
+  return (target: object, propertyKey: string | symbol, parameterIndex: number) => {
+    const params = parameterMetadata.get(target.constructor) ?? new Map();
+    const descriptors = params.get(propertyKey) ?? [];
+    descriptors.push({ index: parameterIndex, type: 'req' });
     params.set(propertyKey, descriptors);
     parameterMetadata.set(target.constructor, params);
   };
@@ -156,14 +187,23 @@ class MiniNestApplication {
           async (req: Request, res: Response) => {
             try {
               const args: unknown[] = [];
-              paramMeta.forEach((param: { index: number; type: 'body' }) => {
+              paramMeta.forEach((param: { index: number; type: ParameterType }) => {
                 if (param.type === 'body') {
                   args[param.index] = req.body;
                 }
+                if (param.type === 'req') {
+                  args[param.index] = req;
+                }
               });
 
+              if (!args.length) {
+                args.push(req, res);
+              }
+
               const result = await (handler as (...args: unknown[]) => unknown).apply(instance, args);
-              res.json(result);
+              if (!res.headersSent) {
+                res.json(result);
+              }
             } catch (error) {
               const status = (error as { status?: number }).status ?? 500;
               res.status(status).json({ message: (error as Error).message });

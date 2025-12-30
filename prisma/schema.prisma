@@ -1,0 +1,152 @@
+// Prisma schema for Portal da Lembrança
+
+// Datasource
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum Status {
+  PENDING_FAMILY_DATA
+  ACTIVE
+  INACTIVE
+}
+
+enum PlanType {
+  ANNUAL
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+model FuneralHome {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  passwordHash String
+  phone       String?
+  address     String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  memorials   Memorial[]
+}
+
+model FamilyUser {
+  id            Int        @id @default(autoincrement())
+  name          String
+  email         String     @unique
+  passwordHash  String?
+  phone         String?
+  invitationToken String?
+  invitationExpiry DateTime?
+  isActive      Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  memorials     Memorial[]
+}
+
+model Memorial {
+  id            Int          @id @default(autoincrement())
+  slug          String       @unique
+  fullName      String
+  birthDate     DateTime?
+  deathDate     DateTime?
+  birthplace    String?
+  parents       String?
+  biography     String?
+  visibility    Visibility   @default(PUBLIC)
+  status        Status       @default(PENDING_FAMILY_DATA)
+  funeralHome   FuneralHome  @relation(fields: [funeralHomeId], references: [id])
+  funeralHomeId Int
+  familyUser    FamilyUser?  @relation(fields: [familyUserId], references: [id])
+  familyUserId  Int?
+  descendants   Descendant[]
+  photos        Photo[]
+  dedications   Dedication[]
+  subscription  Subscription?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Descendant {
+  id         Int      @id @default(autoincrement())
+  memorial   Memorial @relation(fields: [memorialId], references: [id])
+  memorialId Int
+  name       String
+  relationship String
+  createdAt  DateTime @default(now())
+}
+
+model Photo {
+  id         Int      @id @default(autoincrement())
+  memorial   Memorial @relation(fields: [memorialId], references: [id])
+  memorialId Int
+  fileUrl    String
+  caption    String?
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model Dedication {
+  id         Int      @id @default(autoincrement())
+  memorial   Memorial @relation(fields: [memorialId], references: [id])
+  memorialId Int
+  authorName String
+  message    String
+  createdAt  DateTime @default(now())
+}
+
+model Cemetery {
+  id        Int      @id @default(autoincrement())
+  name      String
+  location  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  graves    HistoricalGrave[]
+}
+
+model HistoricalGrave {
+  id          Int       @id @default(autoincrement())
+  cemetery    Cemetery? @relation(fields: [cemeteryId], references: [id])
+  cemeteryId  Int?
+  memorial    Memorial? @relation(fields: [memorialId], references: [id])
+  memorialId  Int?
+  plot        String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AccessLog {
+  id         Int      @id @default(autoincrement())
+  memorial   Memorial? @relation(fields: [memorialId], references: [id])
+  memorialId Int?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+}
+
+model Subscription {
+  id           Int                @id @default(autoincrement())
+  memorial     Memorial           @relation(fields: [memorialId], references: [id])
+  memorialId   Int                @unique
+  planType     PlanType
+  status       SubscriptionStatus
+  priceCents   Int
+  startedAt    DateTime           @default(now())
+  expiresAt    DateTime?
+}

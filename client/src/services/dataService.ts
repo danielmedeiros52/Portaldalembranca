@@ -1,21 +1,3 @@
-/**
- * Data Service Layer
- * 
- * This service abstracts data fetching from JSON files.
- * To switch to API calls, simply replace the import statements
- * with fetch() calls to your API endpoints.
- * 
- * Example API migration:
- * Instead of: import memorialsData from '@/data/memorials.json'
- * Use: const memorialsData = await fetch('/api/memorials').then(r => r.json())
- */
-
-import memorialsData from '@/data/memorials.json';
-import descendantsData from '@/data/descendants.json';
-import photosData from '@/data/photos.json';
-import dedicationsData from '@/data/dedications.json';
-import funeralHomesData from '@/data/funeralHomes.json';
-import familyUsersData from '@/data/familyUsers.json';
 import referencesData from '@/data/references.json';
 
 // Types
@@ -23,18 +5,23 @@ export interface Memorial {
   id: number;
   slug: string;
   fullName: string;
-  birthDate: string;
-  deathDate: string;
-  birthplace: string;
-  filiation: string;
-  biography: string;
-  visibility: 'public' | 'private';
-  status: 'active' | 'pending_data' | 'inactive';
+  birthDate?: string | null;
+  deathDate?: string | null;
+  birthplace?: string | null;
+  parents?: string | null;
+  filiation?: string | null;
+  biography?: string | null;
+  visibility: 'PUBLIC' | 'PRIVATE' | 'public' | 'private';
+  status: 'ACTIVE' | 'PENDING_FAMILY_DATA' | 'INACTIVE' | 'active' | 'pending_data' | 'inactive';
   funeralHomeId: number;
-  familyUserId: number;
-  mainPhoto?: string;
+  familyUserId?: number | null;
+  mainPhoto?: string | null;
   createdAt: string;
   updatedAt: string;
+  _count?: { photos?: number; dedications?: number };
+  descendants?: Descendant[];
+  photos?: Photo[];
+  dedications?: Dedication[];
 }
 
 export interface Descendant {
@@ -50,7 +37,7 @@ export interface Photo {
   id: number;
   memorialId: number;
   fileUrl: string;
-  caption: string;
+  caption?: string | null;
   order: number;
   createdAt: string;
 }
@@ -68,8 +55,8 @@ export interface FuneralHome {
   id: number;
   name: string;
   email: string;
-  phone: string;
-  address: string;
+  phone?: string;
+  address?: string;
   logo?: string;
   description?: string;
   createdAt: string;
@@ -80,7 +67,7 @@ export interface FamilyUser {
   id: number;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   photo?: string;
   isActive: boolean;
   createdAt: string;
@@ -93,92 +80,156 @@ export interface Reference {
   title: string;
   description: string;
   url: string;
-  type: 'article' | 'news' | 'book' | 'document' | 'video' | 'encyclopedia' | 'biography' | 'official' | 'institution' | 'museum' | 'academic';
+  type:
+    | 'article'
+    | 'news'
+    | 'book'
+    | 'document'
+    | 'video'
+    | 'encyclopedia'
+    | 'biography'
+    | 'official'
+    | 'institution'
+    | 'museum'
+    | 'academic';
   source: string;
   date?: string | null;
   order: number;
   createdAt: string;
 }
 
+const API_BASE = '/api';
+
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`.replace(/\+/g, '/'), {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options?.headers || {}),
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || 'Erro ao comunicar com a API');
+  }
+
+  return response.json() as Promise<T>;
+}
+
+function normalizeMemorial(memorial: any): Memorial {
+  return {
+    ...memorial,
+    filiation: memorial.filiation ?? memorial.parents ?? null,
+    parents: memorial.parents ?? memorial.filiation ?? null,
+    visibility: (memorial.visibility || 'PUBLIC') as Memorial['visibility'],
+    status: (memorial.status || 'ACTIVE') as Memorial['status'],
+    birthDate: memorial.birthDate ? new Date(memorial.birthDate).toISOString() : null,
+    deathDate: memorial.deathDate ? new Date(memorial.deathDate).toISOString() : null,
+    createdAt: memorial.createdAt ? new Date(memorial.createdAt).toISOString() : new Date().toISOString(),
+    updatedAt: memorial.updatedAt ? new Date(memorial.updatedAt).toISOString() : new Date().toISOString(),
+  };
+}
+
 // Data Service Class
 class DataService {
   // Memorials
-  async getMemorials(): Promise<Memorial[]> {
-    // TODO: Replace with API call
-    // return fetch('/api/memorials').then(r => r.json());
-    return memorialsData.memorials as Memorial[];
+  async getMemorials(params?: { funeralHomeId?: number; familyUserId?: number }): Promise<Memorial[]> {
+    const query = new URLSearchParams();
+    if (params?.funeralHomeId) query.set('funeralHomeId', String(params.funeralHomeId));
+    if (params?.familyUserId) query.set('familyUserId', String(params.familyUserId));
+
+    const data = await apiFetch<any[]>(`/memorials${query.toString() ? `?${query.toString()}` : ''}`);
+    return data.map(normalizeMemorial);
   }
 
   async getMemorialById(id: number): Promise<Memorial | undefined> {
-    const memorials = await this.getMemorials();
-    return memorials.find(m => m.id === id);
+    try {
+      const memorial = await apiFetch<any>(`/memorials/${id}`);
+      return normalizeMemorial(memorial);
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
   }
 
   async getMemorialBySlug(slug: string): Promise<Memorial | undefined> {
-    const memorials = await this.getMemorials();
-    return memorials.find(m => m.slug === slug);
+    try {
+      const memorial = await apiFetch<any>(`/memorials/by-slug/${slug}`);
+      return normalizeMemorial(memorial);
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
   }
 
   async getMemorialsByFuneralHomeId(funeralHomeId: number): Promise<Memorial[]> {
-    const memorials = await this.getMemorials();
-    return memorials.filter(m => m.funeralHomeId === funeralHomeId);
+    return this.getMemorials({ funeralHomeId });
   }
 
   async getMemorialsByFamilyUserId(familyUserId: number): Promise<Memorial[]> {
-    const memorials = await this.getMemorials();
-    return memorials.filter(m => m.familyUserId === familyUserId);
+    return this.getMemorials({ familyUserId });
+  }
+
+  async createMemorial(payload: {
+    fullName: string;
+    birthDate?: string;
+    deathDate?: string;
+    birthplace?: string;
+    parents?: string;
+    biography?: string;
+    visibility?: 'PUBLIC' | 'PRIVATE';
+    funeralHomeId: number;
+    familyUserId?: number;
+  }): Promise<Memorial> {
+    const memorial = await apiFetch<any>('/memorials', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return normalizeMemorial(memorial);
+  }
+
+  async updateMemorial(id: number, payload: Partial<Omit<Memorial, 'id' | 'slug'>>): Promise<Memorial> {
+    const memorial = await apiFetch<any>(`/memorials/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    return normalizeMemorial(memorial);
   }
 
   // Descendants
-  async getDescendants(): Promise<Descendant[]> {
-    return descendantsData.descendants as Descendant[];
-  }
-
   async getDescendantsByMemorialId(memorialId: number): Promise<Descendant[]> {
-    const descendants = await this.getDescendants();
-    return descendants.filter(d => d.memorialId === memorialId);
+    const memorial = await this.getMemorialById(memorialId);
+    return memorial?.descendants || [];
   }
 
   // Photos
-  async getPhotos(): Promise<Photo[]> {
-    return photosData.photos as Photo[];
-  }
-
   async getPhotosByMemorialId(memorialId: number): Promise<Photo[]> {
-    const photos = await this.getPhotos();
-    return photos.filter(p => p.memorialId === memorialId).sort((a, b) => a.order - b.order);
+    const memorial = await this.getMemorialById(memorialId);
+    return memorial?.photos?.sort((a, b) => a.order - b.order) || [];
   }
 
   // Dedications
-  async getDedications(): Promise<Dedication[]> {
-    return dedicationsData.dedications as Dedication[];
-  }
-
   async getDedicationsByMemorialId(memorialId: number): Promise<Dedication[]> {
-    const dedications = await this.getDedications();
-    return dedications
-      .filter(d => d.memorialId === memorialId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const data = await apiFetch<Dedication[]>(`/dedications?memorialId=${memorialId}`);
+    return data.map(d => ({ ...d, createdAt: new Date(d.createdAt).toISOString() }));
   }
 
-  // Funeral Homes
-  async getFuneralHomes(): Promise<FuneralHome[]> {
-    return funeralHomesData.funeralHomes as FuneralHome[];
+  async createDedication(input: { memorialId: number; authorName: string; message: string }): Promise<Dedication> {
+    const dedication = await apiFetch<Dedication>('/dedications', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+    return { ...dedication, createdAt: new Date(dedication.createdAt).toISOString() };
   }
 
-  async getFuneralHomeById(id: number): Promise<FuneralHome | undefined> {
-    const funeralHomes = await this.getFuneralHomes();
-    return funeralHomes.find(f => f.id === id);
+  // Funeral Homes / Family Users (placeholder until dedicated APIs exist)
+  async getFuneralHomeById(_id: number): Promise<FuneralHome | undefined> {
+    return undefined;
   }
 
-  // Family Users
-  async getFamilyUsers(): Promise<FamilyUser[]> {
-    return familyUsersData.familyUsers as FamilyUser[];
-  }
-
-  async getFamilyUserById(id: number): Promise<FamilyUser | undefined> {
-    const familyUsers = await this.getFamilyUsers();
-    return familyUsers.find(f => f.id === id);
+  async getFamilyUserById(_id: number): Promise<FamilyUser | undefined> {
+    return undefined;
   }
 
   // References (Documentary Sources)
@@ -194,13 +245,14 @@ class DataService {
   // Statistics
   async getStats() {
     const memorials = await this.getMemorials();
-    const dedications = await this.getDedications();
-    const photos = await this.getPhotos();
+    const dedications = await Promise.all(memorials.map(m => this.getDedicationsByMemorialId(m.id)));
+    const photos: Photo[] = (await Promise.all(memorials.map(m => this.getPhotosByMemorialId(m.id))))
+      .flat();
 
     return {
       totalMemorials: memorials.length,
-      activeMemorials: memorials.filter(m => m.status === 'active').length,
-      totalDedications: dedications.length,
+      activeMemorials: memorials.filter(m => (m.status ?? '').toString().toLowerCase().includes('active')).length,
+      totalDedications: dedications.flat().length,
       totalPhotos: photos.length,
     };
   }

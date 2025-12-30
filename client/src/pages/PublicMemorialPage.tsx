@@ -52,10 +52,23 @@ export default function PublicMemorialPage() {
     loadData();
   }, [slug]);
 
-  const handleSubmitDedication = () => {
-    toast.success("Sua dedicação foi enviada.");
-    setShowDedicationDialog(false);
-    setDedicationForm({ authorName: "", message: "" });
+  const handleSubmitDedication = async () => {
+    if (!memorial) return;
+    try {
+      await dataService.createDedication({
+        memorialId: memorial.id,
+        authorName: dedicationForm.authorName || "Visitante",
+        message: dedicationForm.message,
+      });
+      const updated = await dataService.getDedicationsByMemorialId(memorial.id);
+      setDedications(updated);
+      toast.success("Sua dedicação foi enviada.");
+      setShowDedicationDialog(false);
+      setDedicationForm({ authorName: "", message: "" });
+    } catch (error) {
+      console.error(error);
+      toast.error("Não foi possível enviar a homenagem.");
+    }
   };
 
   const handleShare = async () => {

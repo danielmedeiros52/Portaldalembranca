@@ -36,7 +36,17 @@ export default function FuneralHomeDashboard() {
         dataService.getStats()
       ]);
       setMemorials(memorialsData);
-      setFuneralHome(funeralHomeData || null);
+      setFuneralHome(
+        funeralHomeData || {
+          id: 1,
+          name: "Funerária Exemplo",
+          email: "contato@example.com",
+          phone: "",
+          address: "",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+      );
       setStats(statsData);
     };
     loadData();
@@ -44,15 +54,33 @@ export default function FuneralHomeDashboard() {
 
   const handleCreateMemorial = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Memorial criado.");
-    setShowCreateDialog(false);
-    setFormData({
-      fullName: "",
-      birthDate: "",
-      deathDate: "",
-      birthplace: "",
-      familyEmail: "",
-    });
+    try {
+      const memorial = await dataService.createMemorial({
+        fullName: formData.fullName,
+        birthDate: formData.birthDate,
+        deathDate: formData.deathDate,
+        birthplace: formData.birthplace,
+        parents: undefined,
+        biography: undefined,
+        visibility: 'PUBLIC',
+        funeralHomeId: 1,
+      });
+      setMemorials(current => [memorial, ...current]);
+      const newStats = await dataService.getStats();
+      setStats(newStats);
+      toast.success("Memorial criado.");
+      setShowCreateDialog(false);
+      setFormData({
+        fullName: "",
+        birthDate: "",
+        deathDate: "",
+        birthplace: "",
+        familyEmail: "",
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Não foi possível criar o memorial.");
+    }
   };
 
   const filteredMemorials = memorials.filter(m => 

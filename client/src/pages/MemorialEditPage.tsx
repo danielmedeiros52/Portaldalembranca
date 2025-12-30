@@ -57,15 +57,30 @@ export default function MemorialEditPage() {
           biography: memorialData.biography,
         });
       }
-      setDescendants(descendantsData);
-      setPhotos(photosData);
-      setDedications(dedicationsData);
+      setDescendants(descendantsData || []);
+      setPhotos(photosData || []);
+      setDedications(dedicationsData || []);
     };
     loadData();
   }, [memorialId]);
 
   const handleSave = async () => {
-    toast.success("Memorial atualizado.");
+    if (!memorial) return;
+    try {
+      const updated = await dataService.updateMemorial(memorial.id, {
+        fullName: formData.fullName,
+        birthDate: formData.birthDate || undefined,
+        deathDate: formData.deathDate || undefined,
+        birthplace: formData.birthplace || undefined,
+        parents: formData.filiation || undefined,
+        biography: formData.biography || undefined,
+      });
+      setMemorial(updated);
+      toast.success("Memorial atualizado.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Não foi possível atualizar o memorial.");
+    }
   };
 
   const handleAddDescendant = () => {

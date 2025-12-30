@@ -17,16 +17,20 @@ export default function FamilyDashboard() {
 
   useEffect(() => {
     const loadData = async () => {
-      const [memorialsData, familyUserData, dedicationsData] = await Promise.all([
+      const [memorialsData, familyUserData] = await Promise.all([
         dataService.getMemorialsByFamilyUserId(1),
-        dataService.getFamilyUserById(1),
-        dataService.getDedications()
+        dataService.getFamilyUserById(1)
       ]);
       setMemorials(memorialsData);
       setFamilyUser(familyUserData || null);
       // Get recent dedications for user's memorials
-      const userMemorialIds = memorialsData.map(m => m.id);
-      const userDedications = dedicationsData.filter(d => userMemorialIds.includes(d.memorialId)).slice(0, 5);
+      const dedicationsLists = await Promise.all(
+        memorialsData.map(m => dataService.getDedicationsByMemorialId(m.id))
+      );
+      const userDedications = dedicationsLists
+        .flat()
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
       setRecentDedications(userDedications);
     };
     loadData();
