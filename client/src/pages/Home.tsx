@@ -237,12 +237,12 @@ export default function Home() {
                   Compartilhamento ilimitado
                 </li>
               </ul>
-              <Button 
+              <Button
                 onClick={() => setLocation("/checkout")}
                 variant="outline"
                 className="w-full btn-outline"
               >
-                Começar Agora
+                Criar Memorial
               </Button>
             </div>
 
