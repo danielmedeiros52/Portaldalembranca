@@ -29,3 +29,8 @@ A integração com Stripe usa a variável `STRIPE_SECRET_KEY`. Em ambientes loca
 1. Instale dependências com `npm install`.
 2. Rode `npm run dev` para acompanhar a API.
 3. Para produção, execute `npm run build` seguido de `npm start`.
+
+## Banco de dados (Prisma)
+- Configure a variável `DATABASE_URL` apontando para seu PostgreSQL.
+- Para gerar a base inicial, rode `npx prisma migrate dev --name init_portal_da_lembranca`.
+- Se precisar apenas gerar arquivos da migration sem aplicá-la, utilize a flag `--create-only`.

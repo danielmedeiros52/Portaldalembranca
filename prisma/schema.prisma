@@ -1,0 +1,158 @@
+// Prisma schema for Portal da Lembrança
+// Configured for PostgreSQL deployments (e.g., Vercel Postgres)
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum Status {
+  PENDING_FAMILY_DATA
+  ACTIVE
+  INACTIVE
+}
+
+enum PlanType {
+  ANNUAL
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+model FuneralHome {
+  id         Int        @id @default(autoincrement())
+  name       String
+  email      String     @unique
+  phone      String?
+  address    String?
+  memorials  Memorial[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model FamilyUser {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  passwordHash String?
+  phone       String?
+  memorials   Memorial[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Memorial {
+  id             Int                @id @default(autoincrement())
+  slug           String             @unique
+  fullName       String
+  birthDate      DateTime?
+  deathDate      DateTime?
+  birthplace     String?
+  parents        String?
+  biography      String?
+  visibility     Visibility         @default(PUBLIC)
+  status         Status             @default(PENDING_FAMILY_DATA)
+  funeralHomeId  Int
+  familyUserId   Int?
+  funeralHome    FuneralHome        @relation(fields: [funeralHomeId], references: [id])
+  familyUser     FamilyUser?        @relation(fields: [familyUserId], references: [id])
+  descendants    Descendant[]
+  photos         Photo[]
+  dedications    Dedication[]
+  cemetery       Cemetery?
+  historicalGrave HistoricalGrave?
+  subscription   Subscription?
+  accessLogs     AccessLog[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([funeralHomeId])
+  @@index([familyUserId])
+}
+
+model Descendant {
+  id         Int       @id @default(autoincrement())
+  memorialId Int
+  memorial   Memorial  @relation(fields: [memorialId], references: [id])
+  name       String
+  relationship String
+  createdAt  DateTime  @default(now())
+
+  @@index([memorialId])
+}
+
+model Photo {
+  id         Int       @id @default(autoincrement())
+  memorialId Int
+  memorial   Memorial  @relation(fields: [memorialId], references: [id])
+  url        String
+  caption    String?
+  createdAt  DateTime  @default(now())
+
+  @@index([memorialId])
+}
+
+model Dedication {
+  id         Int       @id @default(autoincrement())
+  memorialId Int
+  memorial   Memorial  @relation(fields: [memorialId], references: [id])
+  authorName String
+  message    String
+  createdAt  DateTime  @default(now())
+
+  @@index([memorialId])
+}
+
+model Cemetery {
+  id         Int       @id @default(autoincrement())
+  memorialId Int       @unique
+  memorial   Memorial  @relation(fields: [memorialId], references: [id])
+  name       String
+  location   String?
+  plot       String?
+  createdAt  DateTime  @default(now())
+}
+
+model HistoricalGrave {
+  id           Int       @id @default(autoincrement())
+  memorialId   Int       @unique
+  memorial     Memorial  @relation(fields: [memorialId], references: [id])
+  graveNumber  String?
+  description  String?
+  registeredBy String?
+  createdAt    DateTime  @default(now())
+}
+
+model AccessLog {
+  id         Int       @id @default(autoincrement())
+  memorialId Int
+  memorial   Memorial  @relation(fields: [memorialId], references: [id])
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+
+  @@index([memorialId])
+}
+
+model Subscription {
+  id         Int                 @id @default(autoincrement())
+  memorialId Int                 @unique
+  memorial   Memorial            @relation(fields: [memorialId], references: [id])
+  planType   PlanType
+  status     SubscriptionStatus  @default(ACTIVE)
+  startedAt  DateTime            @default(now())
+  expiresAt  DateTime?
+}
