@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { funeralHomes, familyUsers, memorials, descendants, photos, dedications, InsertMemorial, InsertDescendant, InsertPhoto, InsertDedication } from "../drizzle/schema";
+import { funeralHomes, familyUsers, memorials, descendants, photos, dedications, leads, InsertMemorial, InsertDescendant, InsertPhoto, InsertDedication, InsertLead } from "../drizzle/schema";
 import * as db from "./db";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -350,6 +350,44 @@ const dedicationRouter = router({
     }),
 });
 
+// Lead Router
+const leadRouter = router({
+  create: publicProcedure
+    .input(z.object({
+      name: z.string().min(1, "Nome é obrigatório"),
+      email: z.string().email("E-mail inválido"),
+      phone: z.string().optional(),
+      acceptEmails: z.boolean(),
+    }))
+    .mutation(async ({ input }) => {
+      // Check if email already exists
+      const existingLead = await db.getLeadByEmail(input.email);
+      if (existingLead) {
+        throw new Error("Este e-mail já foi cadastrado. Entraremos em contato em breve!");
+      }
+
+      // Create new lead
+      const lead = await db.createLead({
+        name: input.name,
+        email: input.email,
+        phone: input.phone,
+        acceptEmails: input.acceptEmails,
+        status: "pending",
+      });
+
+      if (!lead) {
+        throw new Error("Erro ao salvar solicitação. Tente novamente.");
+      }
+
+      return { success: true, leadId: lead.id };
+    }),
+
+  getAll: protectedProcedure
+    .query(async () => {
+      return db.getAllLeads();
+    }),
+});
+
 export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
@@ -357,6 +395,7 @@ export const appRouter = router({
   descendant: descendantRouter,
   photo: photoRouter,
   dedication: dedicationRouter,
+  lead: leadRouter,
 });
 
 export type AppRouter = typeof appRouter;

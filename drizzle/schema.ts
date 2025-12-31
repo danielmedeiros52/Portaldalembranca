@@ -133,3 +133,20 @@ export const dedications = pgTable("dedications", {
 
 export type Dedication = typeof dedications.$inferSelect;
 export type InsertDedication = typeof dedications.$inferInsert;
+
+/**
+ * Leads table for invitation requests from landing page
+ */
+export const leads = pgTable("leads", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  acceptEmails: boolean("accept_emails").default(false).notNull(),
+  status: varchar("status", { length: 50 }).default("pending").notNull(), // pending, contacted, converted
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Lead = typeof leads.$inferSelect;
+export type InsertLead = typeof leads.$inferInsert;
