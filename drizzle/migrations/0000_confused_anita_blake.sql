@@ -82,3 +82,32 @@ CREATE TABLE "users" (
 	"lastSignedIn" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_openId_unique" UNIQUE("openId")
 );
+--> statement-breakpoint
+-- Seed data: Funeral Home for historical memorials
+INSERT INTO "funeral_homes" ("name", "email", "password_hash", "phone", "address", "createdAt", "updatedAt")
+VALUES (
+	'Portal da Lembrança - Memoriais Históricos',
+	'historicos@portaldalembranca.com.br',
+	'$2a$10$placeholder_hash_for_historical_account',
+	'(81) 0000-0000',
+	'Recife, Pernambuco, Brasil',
+	now(),
+	now()
+);
+--> statement-breakpoint
+-- Seed data: Historical Memorial - Chico Science
+INSERT INTO "memorials" ("slug", "full_name", "birth_date", "death_date", "birthplace", "filiation", "biography", "visibility", "status", "funeral_home_id", "createdAt", "updatedAt")
+VALUES (
+	'chico-science',
+	'Francisco de Assis França',
+	'13/03/1966',
+	'02/02/1997',
+	'Recife, Pernambuco',
+	'Filho de Severina Maia França e José Valdemar França',
+	'Chico Science foi um cantor, compositor e líder da banda Chico Science & Nação Zumbi. Revolucionou a música brasileira ao criar o movimento manguebeat, fundindo ritmos regionais como maracatu e coco com rock, funk e hip hop. Sua obra influenciou gerações e colocou Recife no mapa da música mundial.',
+	'public',
+	'active',
+	1,
+	now(),
+	now()
+);
