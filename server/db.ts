@@ -1,7 +1,7 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { InsertUser, users, funeralHomes, familyUsers, memorials, descendants, photos, dedications, FuneralHome, FamilyUser, Memorial, Descendant, Photo, Dedication, InsertMemorial, InsertDescendant, InsertPhoto, InsertDedication } from "../drizzle/schema";
+import { InsertUser, users, funeralHomes, familyUsers, memorials, descendants, photos, dedications, leads, FuneralHome, FamilyUser, Memorial, Descendant, Photo, Dedication, Lead, InsertMemorial, InsertDescendant, InsertPhoto, InsertDedication, InsertLead } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -182,4 +182,33 @@ export async function getDedicationsByMemorialId(memorialId: number): Promise<De
   const db = await getDb();
   if (!db) return [];
   return db.select().from(dedications).where(eq(dedications.memorialId, memorialId)).orderBy(desc(dedications.createdAt));
+}
+
+// Lead queries
+export async function createLead(lead: InsertLead): Promise<Lead | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  try {
+    await db.insert(leads).values(lead);
+    // Get the created lead by email (since we just inserted it)
+    const result = await db.select().from(leads).where(eq(leads.email, lead.email)).orderBy(desc(leads.createdAt)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to create lead:", error);
+    throw error;
+  }
+}
+
+export async function getLeadByEmail(email: string): Promise<Lead | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(leads).where(eq(leads.email, email)).orderBy(desc(leads.createdAt)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAllLeads(): Promise<Lead[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(leads).orderBy(desc(leads.createdAt));
 }

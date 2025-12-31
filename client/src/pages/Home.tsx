@@ -6,6 +6,7 @@ import { Heart, QrCode, Users, Shield, Sparkles, ArrowRight, Star, X, Mail, User
 import { SEOHead } from "@/components/SEOHead";
 import { StructuredData, organizationSchema } from "@/components/StructuredData";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -18,6 +19,18 @@ export default function Home() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inviteSuccess, setInviteSuccess] = useState(false);
+
+  const createLeadMutation = trpc.lead.create.useMutation({
+    onSuccess: () => {
+      setIsSubmitting(false);
+      setInviteSuccess(true);
+      toast.success("Solicitação enviada com sucesso!");
+    },
+    onError: (error) => {
+      setIsSubmitting(false);
+      toast.error(error.message || "Erro ao enviar solicitação. Tente novamente.");
+    },
+  });
 
   const handleInviteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,12 +50,13 @@ export default function Home() {
 
     setIsSubmitting(true);
     
-    // Simula envio para API
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setInviteSuccess(true);
-    toast.success("Solicitação enviada com sucesso!");
+    // Envia para API
+    createLeadMutation.mutate({
+      name: inviteForm.name,
+      email: inviteForm.email,
+      phone: inviteForm.phone || undefined,
+      acceptEmails: inviteForm.acceptEmails,
+    });
   };
 
   const closeModal = () => {
