@@ -96,7 +96,7 @@ const PLANS: Plan[] = [
     renewalPrice: 19.90,
     currency: 'BRL',
     interval: 'year',
-    stripePriceId: 'price_essencial_annual',
+    stripePriceId: 'prod_TiiUFKT7NvAWvA',
     hasPlate: false,
     features: [
       'Página memorial personalizada',
@@ -116,7 +116,7 @@ const PLANS: Plan[] = [
     currency: 'BRL',
     interval: 'year',
     popular: true,
-    stripePriceId: 'price_premium_annual',
+    stripePriceId: 'prod_Tihb3SipDs4nOP',
     hasPlate: true,
     features: [
       'Tudo do plano Essencial',
@@ -136,7 +136,7 @@ const PLANS: Plan[] = [
     renewalPrice: 59.90,
     currency: 'BRL',
     interval: 'year',
-    stripePriceId: 'price_familia_annual',
+    stripePriceId: 'prod_TiiVZKqHg334zv',
     hasPlate: true,
     features: [
       'Até 5 memoriais Premium',

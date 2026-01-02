@@ -8,7 +8,7 @@ import {
   Mail, Lock, User, Phone, MapPin, FileText, Loader2, CheckCircle2
 } from "lucide-react";
 import { APP_TITLE } from "@/const";
-import { authService, RegisterData } from "@/services/authService";
+import { trpc } from "@/lib/trpc";
 
 export default function RegisterPage() {
   const [, setLocation] = useLocation();
@@ -24,17 +24,21 @@ export default function RegisterPage() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   
   // Form fields
-  const [formData, setFormData] = useState<RegisterData>({
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
     phone: "",
-    userType: "family",
+    userType: "family" as "funeral_home" | "family",
     companyName: "",
     cnpj: "",
     address: ""
   });
+
+  // tRPC mutations for real registration
+  const funeralHomeRegisterMutation = trpc.auth.funeralHomeRegister.useMutation();
+  const familyUserRegisterMutation = trpc.auth.familyUserRegister.useMutation();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -96,23 +100,52 @@ export default function RegisterPage() {
     setIsLoading(true);
     
     try {
-      const response = await authService.register(formData);
+      let result;
       
-      if (response.success) {
-        toast.success(response.message);
+      if (userType === "funeral_home") {
+        // Register funeral home via tRPC
+        result = await funeralHomeRegisterMutation.mutateAsync({
+          name: formData.companyName || formData.name,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          address: formData.address,
+        });
+        
+        toast.success("Cadastro realizado com sucesso!");
+        setLocation("/login");
+      } else {
+        // Register family user via tRPC
+        result = await familyUserRegisterMutation.mutateAsync({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+        });
+        
+        // Store session
+        const session = {
+          id: result.id,
+          name: result.name,
+          email: result.email,
+          type: result.type,
+          isDemo: false,
+          loginTime: new Date().toISOString(),
+        };
+        localStorage.setItem("userSession", JSON.stringify(session));
+        
+        toast.success("Cadastro realizado com sucesso!");
+        
         // Redirect to checkout if plan was selected, otherwise to dashboard
-        if (userType === "funeral_home") {
-          setLocation("/dashboard/funeral-home");
-        } else if (selectedPlan) {
+        if (selectedPlan) {
           setLocation(`/checkout?plan=${selectedPlan}`);
         } else {
           setLocation("/dashboard/family");
         }
-      } else {
-        toast.error(response.message);
       }
-    } catch (error) {
-      toast.error("Erro ao criar conta. Tente novamente.");
+    } catch (error: any) {
+      console.error("Register error:", error);
+      toast.error(error.message || "Erro ao criar conta. Tente novamente.");
     } finally {
       setIsLoading(false);
     }

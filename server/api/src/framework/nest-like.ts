@@ -119,6 +119,7 @@ class MiniNestApplication {
   private readonly server = http.createServer(this.app);
   private globalPrefix = '';
   private readonly corsHeaders: Record<string, string> = {};
+  private readonly logger = new Logger('MiniNest');
 
   constructor(private readonly rootModule: new () => unknown) {
     this.app.use(json({ limit: '1mb' }));
@@ -127,8 +128,13 @@ class MiniNestApplication {
   enableCors() {
     this.corsHeaders['Access-Control-Allow-Origin'] = '*';
     this.corsHeaders['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+    this.corsHeaders['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
     this.app.use((_req, res, next) => {
       Object.entries(this.corsHeaders).forEach(([key, value]) => res.setHeader(key, value));
+      if (_req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+      }
       next();
     });
   }
@@ -137,52 +143,93 @@ class MiniNestApplication {
     this.globalPrefix = prefix.startsWith('/') ? prefix : `/${prefix}`;
   }
 
+  /**
+   * Recursively collect all controllers from a module and its imports
+   */
+  private collectControllersFromModule(moduleClass: new () => unknown): Array<new (...args: any[]) => any> {
+    const moduleMeta = getModule(moduleClass);
+    const controllers: Array<new (...args: any[]) => any> = [];
+
+    // Add controllers from this module
+    if (moduleMeta.controllers) {
+      controllers.push(...moduleMeta.controllers);
+    }
+
+    // Recursively add controllers from imported modules
+    if (moduleMeta.imports) {
+      for (const importedModule of moduleMeta.imports) {
+        const importedControllers = this.collectControllersFromModule(importedModule);
+        controllers.push(...importedControllers);
+      }
+    }
+
+    return controllers;
+  }
+
+  private registerController(controller: new (...args: any[]) => any) {
+    const instance = new controller() as Record<string, unknown>;
+    const { prefix } = getController(controller);
+    const routes = getRoutes(controller);
+
+    routes.forEach(route => {
+      const handler = instance[route.handlerName] as unknown;
+      if (typeof handler !== 'function') {
+        return;
+      }
+
+      // Handle route parameters like :id
+      let routePath = route.path;
+      if (routePath.includes(':')) {
+        // Express already handles :param syntax
+      }
+
+      const fullPath = `${this.globalPrefix}${prefix ? `/${prefix}` : ''}${routePath ? `/${routePath}` : ''}`
+        .replace(/\/+/g, '/')
+        .replace(/\/+$/, '') || '/';
+
+      const paramMeta = getParams(controller, route.handlerName);
+
+      const routerMethod = (this.app as unknown as Record<string, unknown>)[route.method] as
+        | ((path: string, handler: (req: Request, res: Response) => void) => void)
+        | undefined;
+
+      this.logger.log(`Registering route: ${route.method.toUpperCase()} ${fullPath}`);
+
+      routerMethod?.call(
+        this.app,
+        fullPath,
+        async (req: Request, res: Response) => {
+          try {
+            const args: unknown[] = [];
+            paramMeta.forEach((param: { index: number; type: 'body' | 'param'; paramName?: string }) => {
+              if (param.type === 'body') {
+                args[param.index] = req.body;
+              } else if (param.type === 'param' && param.paramName) {
+                args[param.index] = req.params[param.paramName];
+              }
+            });
+
+            const result = await (handler as (...args: unknown[]) => unknown).apply(instance, args);
+            res.json(result);
+          } catch (error) {
+            this.logger.error(`Error in ${route.method.toUpperCase()} ${fullPath}: ${(error as Error).message}`);
+            const status = (error as { status?: number }).status ?? 500;
+            res.status(status).json({ message: (error as Error).message });
+          }
+        },
+      );
+    });
+  }
+
   private registerControllers() {
-    const moduleMeta = getModule(this.rootModule);
-    moduleMeta.controllers?.forEach(controller => {
-      const instance = new controller() as Record<string, unknown>;
-      const { prefix } = getController(controller);
-      const routes = getRoutes(controller);
-
-      routes.forEach(route => {
-        const handler = instance[route.handlerName] as unknown;
-        if (typeof handler !== 'function') {
-          return;
-        }
-
-        const fullPath = `${this.globalPrefix}${prefix ? `/${prefix}` : ''}/${route.path}`
-          .replace(/\/+/g, '/')
-          .replace(/\/+$/, '') || '/';
-
-        const paramMeta = getParams(controller, route.handlerName);
-
-        const routerMethod = (this.app as unknown as Record<string, unknown>)[route.method] as
-          | ((path: string, handler: (req: Request, res: Response) => void) => void)
-          | undefined;
-
-        routerMethod?.call(
-          this.app,
-          fullPath,
-          async (req: Request, res: Response) => {
-            try {
-              const args: unknown[] = [];
-              paramMeta.forEach((param: { index: number; type: 'body' | 'param'; paramName?: string }) => {
-                if (param.type === 'body') {
-                  args[param.index] = req.body;
-                } else if (param.type === 'param' && param.paramName) {
-                  args[param.index] = req.params[param.paramName];
-                }
-              });
-
-              const result = await (handler as (...args: unknown[]) => unknown).apply(instance, args);
-              res.json(result);
-            } catch (error) {
-              const status = (error as { status?: number }).status ?? 500;
-              res.status(status).json({ message: (error as Error).message });
-            }
-          },
-        );
-      });
+    // Collect all controllers from root module and imported modules
+    const allControllers = this.collectControllersFromModule(this.rootModule);
+    
+    this.logger.log(`Found ${allControllers.length} controllers to register`);
+    
+    // Register each controller
+    allControllers.forEach(controller => {
+      this.registerController(controller);
     });
   }
 

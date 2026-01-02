@@ -74,6 +74,35 @@ const authRouter = router({
       return { success: true };
     }),
 
+  // Family User Register
+  familyUserRegister: publicProcedure
+    .input(z.object({
+      name: z.string().min(1),
+      email: z.string().email(),
+      password: z.string().min(6),
+      phone: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const existing = await db.getFamilyUserByEmail(input.email);
+      if (existing) {
+        throw new Error("E-mail já registrado");
+      }
+      const passwordHash = await bcrypt.hash(input.password, 10);
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new Error("Banco de dados não disponível");
+
+      await dbInstance.insert(familyUsers).values({
+        name: input.name,
+        email: input.email,
+        passwordHash,
+        phone: input.phone,
+        isActive: true,
+      });
+
+      const newUser = await db.getFamilyUserByEmail(input.email);
+      return { id: newUser?.id, name: newUser?.name, email: newUser?.email, type: "family_user" };
+    }),
+
   // Family User Login
   familyUserLogin: publicProcedure
     .input(z.object({
