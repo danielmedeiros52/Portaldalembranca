@@ -2,7 +2,12 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 export const APP_TITLE = import.meta.env.VITE_APP_TITLE || "Portal da Lembrança";
 
-export const APP_LOGO = "https://placehold.co/128x128/E1E7EF/1F2937?text=App";
+export const APP_LOGO = "/brand/logo-icon.png";
+export const APP_LOGO_HORIZONTAL = "/brand/logo-horizontal.png";
+export const APP_LOGO_VERTICAL = "/brand/logo-vertical.png";
+export const APP_LOGO_DARK = "/brand/logo-icon-dark.png";
+export const APP_LOGO_HORIZONTAL_DARK = "/brand/logo-horizontal-dark.png";
+export const APP_LOGO_VERTICAL_DARK = "/brand/logo-vertical-dark.png";
 
 // Generate login URL at runtime so redirect URI reflects the current origin.
 export const getLoginUrl = () => {
