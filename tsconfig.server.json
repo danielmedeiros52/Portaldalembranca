@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2021",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "lib": ["es2021"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -12,10 +12,13 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    "rootDir": "server/api/src",
+    "rootDir": ".",
     "types": ["node"],
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["./shared/*"]
+    }
   },
-  "include": ["server/api/src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+  "include": ["server/**/*", "shared/**/*", "drizzle/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "client/**/*"]
 }
