@@ -5,32 +5,49 @@ import { dataService, Memorial, FamilyUser, Dedication } from "@/services/dataSe
 import { 
   QrCode, Eye, Edit3, LogOut, Heart, Image, Users,
   LayoutGrid, Calendar, MapPin, MessageSquare, ChevronRight,
-  Bell, Settings
+  Bell, Settings, Loader2
 } from "lucide-react";
 import { APP_TITLE } from "@/const";
+import { useFamilyAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 export default function FamilyDashboard() {
   const [, setLocation] = useLocation();
+  const { session, isLoading: authLoading, isDemo, logout } = useFamilyAuth();
   const [memorials, setMemorials] = useState<Memorial[]>([]);
   const [familyUser, setFamilyUser] = useState<FamilyUser | null>(null);
   const [recentDedications, setRecentDedications] = useState<Dedication[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      const [memorialsData, familyUserData, dedicationsData] = await Promise.all([
-        dataService.getMemorialsByFamilyUserId(1),
-        dataService.getFamilyUserById(1),
-        dataService.getDedications()
-      ]);
-      setMemorials(memorialsData);
-      setFamilyUser(familyUserData || null);
-      // Get recent dedications for user's memorials
-      const userMemorialIds = memorialsData.map(m => m.id);
-      const userDedications = dedicationsData.filter(d => userMemorialIds.includes(d.memorialId)).slice(0, 5);
-      setRecentDedications(userDedications);
+      if (authLoading) return;
+      
+      try {
+        setDataLoading(true);
+        // Use session ID if available, otherwise use demo data (ID 1)
+        const familyUserId = session?.id || 1;
+        
+        const [memorialsData, familyUserData, dedicationsData] = await Promise.all([
+          dataService.getMemorialsByFamilyUserId(familyUserId),
+          dataService.getFamilyUserById(familyUserId),
+          dataService.getDedications()
+        ]);
+        setMemorials(memorialsData);
+        setFamilyUser(familyUserData || null);
+        // Get recent dedications for user's memorials
+        const userMemorialIds = memorialsData.map(m => m.id);
+        const userDedications = dedicationsData.filter(d => userMemorialIds.includes(d.memorialId)).slice(0, 5);
+        setRecentDedications(userDedications);
+      } catch (error) {
+        console.error("Error loading data:", error);
+        toast.error("Erro ao carregar dados");
+      } finally {
+        setDataLoading(false);
+      }
     };
     loadData();
-  }, []);
+  }, [authLoading, session]);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -62,7 +79,7 @@ export default function FamilyDashboard() {
             variant="ghost" 
             size="sm"
             className="text-gray-600"
-            onClick={() => setLocation("/")}
+            onClick={logout}
           >
             <LogOut className="w-4 h-4" />
           </Button>
@@ -119,7 +136,7 @@ export default function FamilyDashboard() {
           <Button 
             variant="outline" 
             className="w-full justify-start gap-2 text-gray-600"
-            onClick={() => setLocation("/")}
+            onClick={logout}
           >
             <LogOut className="w-4 h-4" />
             Sair

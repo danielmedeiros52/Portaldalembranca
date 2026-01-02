@@ -20,6 +20,7 @@ interface AdminSession {
   name: string;
   email: string;
   type: string;
+  isDemo: boolean;
   loginTime: string;
 }
 
@@ -125,7 +126,7 @@ export default function AdminDashboard() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showLeadDialog, setShowLeadDialog] = useState(false);
 
-  // Check admin session
+  // Check admin session with expiration
   useEffect(() => {
     const session = localStorage.getItem("adminSession");
     if (!session) {
@@ -133,7 +134,20 @@ export default function AdminDashboard() {
       return;
     }
     try {
-      const parsed = JSON.parse(session);
+      const parsed = JSON.parse(session) as AdminSession;
+      
+      // Check if session is expired (24 hours)
+      const loginTime = new Date(parsed.loginTime);
+      const now = new Date();
+      const hoursDiff = (now.getTime() - loginTime.getTime()) / (1000 * 60 * 60);
+      
+      if (hoursDiff > 24) {
+        localStorage.removeItem("adminSession");
+        toast.error("Sessão expirada. Faça login novamente.");
+        setLocation("/admin/login");
+        return;
+      }
+      
       setAdminSession(parsed);
     } catch {
       localStorage.removeItem("adminSession");

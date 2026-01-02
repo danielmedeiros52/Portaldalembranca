@@ -3,8 +3,13 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { QrCode, Building2, Users, ArrowLeft, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { QrCode, Building2, Users, ArrowLeft, Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 import { APP_TITLE } from "@/const";
+import { trpc } from "@/lib/trpc";
+
+// Demo credentials
+const DEMO_EMAIL = "demo@portaldalembranca.com";
+const DEMO_PASSWORD = "demo123456";
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
@@ -12,16 +17,101 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<"funeral_home" | "family">("funeral_home");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleDemoLogin = async (e: React.FormEvent) => {
+  // tRPC mutations for real authentication
+  const funeralHomeLoginMutation = trpc.auth.funeralHomeLogin.useMutation();
+  const familyUserLoginMutation = trpc.auth.familyUserLogin.useMutation();
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Login realizado com sucesso!");
     
-    if (userType === "funeral_home") {
-      setLocation("/dashboard/funeral-home");
-    } else {
-      setLocation("/dashboard/family");
+    // Validate inputs
+    if (!email || !password) {
+      toast.error("Por favor, preencha todos os campos");
+      return;
     }
+
+    if (password.length < 6) {
+      toast.error("A senha deve ter no mínimo 6 caracteres");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Check if it's demo mode
+      const isDemoMode = email.toLowerCase() === DEMO_EMAIL && password === DEMO_PASSWORD;
+
+      if (isDemoMode) {
+        // Demo mode - simulate login with demo data
+        toast.success("Login realizado com sucesso! (Modo Demonstração)");
+        
+        // Store demo session
+        const demoSession = {
+          id: 0,
+          name: userType === "funeral_home" ? "Funerária Demo" : "Família Demo",
+          email: DEMO_EMAIL,
+          type: userType,
+          isDemo: true,
+          loginTime: new Date().toISOString(),
+        };
+        localStorage.setItem("userSession", JSON.stringify(demoSession));
+        
+        if (userType === "funeral_home") {
+          setLocation("/dashboard/funeral-home");
+        } else {
+          setLocation("/dashboard/family");
+        }
+        return;
+      }
+
+      // Real authentication via tRPC
+      if (userType === "funeral_home") {
+        const result = await funeralHomeLoginMutation.mutateAsync({ email, password });
+        
+        // Store session
+        const session = {
+          id: result.id,
+          name: result.name,
+          email: result.email,
+          type: result.type,
+          isDemo: false,
+          loginTime: new Date().toISOString(),
+        };
+        localStorage.setItem("userSession", JSON.stringify(session));
+        
+        toast.success("Login realizado com sucesso!");
+        setLocation("/dashboard/funeral-home");
+      } else {
+        const result = await familyUserLoginMutation.mutateAsync({ email, password });
+        
+        // Store session
+        const session = {
+          id: result.id,
+          name: result.name,
+          email: result.email,
+          type: result.type,
+          isDemo: false,
+          loginTime: new Date().toISOString(),
+        };
+        localStorage.setItem("userSession", JSON.stringify(session));
+        
+        toast.success("Login realizado com sucesso!");
+        setLocation("/dashboard/family");
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast.error(error.message || "E-mail ou senha inválidos");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fillDemoCredentials = () => {
+    setEmail(DEMO_EMAIL);
+    setPassword(DEMO_PASSWORD);
+    toast.info("Credenciais de demonstração preenchidas");
   };
 
   return (
@@ -106,7 +196,7 @@ export default function LoginPage() {
               </TabsList>
 
               <TabsContent value="funeral_home">
-                <form onSubmit={handleDemoLogin} className="space-y-5">
+                <form onSubmit={handleLogin} className="space-y-5">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
                     <div className="relative">
@@ -117,6 +207,7 @@ export default function LoginPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="input-modern pl-12"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -130,6 +221,7 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="input-modern pl-12 pr-12"
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
@@ -147,14 +239,21 @@ export default function LoginPage() {
                     </label>
                     <a href="#" onClick={(e) => { e.preventDefault(); setLocation("/forgot-password"); }} className="text-sm text-teal-600 hover:text-teal-700">Esqueceu a senha?</a>
                   </div>
-                  <Button type="submit" className="w-full btn-primary">
-                    Entrar como Funerária
+                  <Button type="submit" className="w-full btn-primary" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Entrando...
+                      </>
+                    ) : (
+                      "Entrar como Funerária"
+                    )}
                   </Button>
                 </form>
               </TabsContent>
 
               <TabsContent value="family">
-                <form onSubmit={handleDemoLogin} className="space-y-5">
+                <form onSubmit={handleLogin} className="space-y-5">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
                     <div className="relative">
@@ -165,6 +264,7 @@ export default function LoginPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="input-modern pl-12"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -178,6 +278,7 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="input-modern pl-12 pr-12"
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
@@ -195,17 +296,33 @@ export default function LoginPage() {
                     </label>
                     <a href="#" onClick={(e) => { e.preventDefault(); setLocation("/forgot-password"); }} className="text-sm text-rose-600 hover:text-rose-700">Esqueceu a senha?</a>
                   </div>
-                  <Button type="submit" className="w-full btn-secondary">
-                    Entrar como Família
+                  <Button type="submit" className="w-full btn-secondary" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Entrando...
+                      </>
+                    ) : (
+                      "Entrar como Família"
+                    )}
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
 
             {/* Demo Notice */}
-            <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-200">
-              <p className="text-sm text-amber-800 text-center">
-                <strong>Modo Demonstração:</strong> Use qualquer e-mail e senha para testar o sistema.
+            <div className="mt-6 p-4 bg-teal-50 rounded-xl border border-teal-200">
+              <p className="text-sm text-teal-800 text-center mb-3">
+                <strong>Quer testar o sistema?</strong>
+              </p>
+              <button
+                onClick={fillDemoCredentials}
+                className="w-full text-sm text-teal-700 hover:text-teal-900 font-medium py-2 px-4 rounded-lg bg-teal-100 hover:bg-teal-200 transition-colors"
+              >
+                Usar credenciais de demonstração
+              </button>
+              <p className="text-xs text-teal-600 text-center mt-2">
+                E-mail: {DEMO_EMAIL}
               </p>
             </div>
 

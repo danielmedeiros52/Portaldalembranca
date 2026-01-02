@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Shield, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Shield, Eye, EyeOff, Lock, Mail, Loader2 } from "lucide-react";
 import { APP_TITLE } from "@/const";
+import { trpc } from "@/lib/trpc";
 
 export default function AdminLoginPage() {
   const [, setLocation] = useLocation();
@@ -14,17 +15,39 @@ export default function AdminLoginPage() {
     password: "",
   });
 
+  // tRPC mutation for admin login
+  const adminLoginMutation = trpc.admin.login.useMutation();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs
+    if (!formData.email || !formData.password) {
+      toast.error("Por favor, preencha todos os campos");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast.error("A senha deve ter no mínimo 6 caracteres");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      // Try real authentication via tRPC
+      const result = await adminLoginMutation.mutateAsync({
+        email: formData.email,
+        password: formData.password,
+      });
+
       // Store admin session in localStorage
       const adminData = {
-        id: 1,
-        name: "Administrador",
-        email: formData.email,
-        type: "admin",
+        id: result.id,
+        name: result.name,
+        email: result.email,
+        type: result.type,
+        isDemo: false,
         loginTime: new Date().toISOString(),
       };
       
@@ -32,7 +55,8 @@ export default function AdminLoginPage() {
       toast.success("Login realizado com sucesso!");
       setLocation("/admin");
     } catch (error: any) {
-      toast.error(error.message || "Erro ao fazer login");
+      console.error("Admin login error:", error);
+      toast.error(error.message || "E-mail ou senha inválidos");
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +89,8 @@ export default function AdminLoginPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  disabled={isLoading}
+                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all disabled:opacity-50"
                 />
               </div>
             </div>
@@ -82,7 +107,8 @@ export default function AdminLoginPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  disabled={isLoading}
+                  className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -99,7 +125,14 @@ export default function AdminLoginPage() {
               disabled={isLoading}
               className="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-teal-500/25"
             >
-              {isLoading ? "Entrando..." : "Entrar"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Entrando...
+                </>
+              ) : (
+                "Entrar"
+              )}
             </Button>
           </form>
 

@@ -7,18 +7,21 @@ import { dataService, Memorial, FuneralHome } from "@/services/dataService";
 import { 
   QrCode, Plus, Eye, Edit3, LogOut, Search, 
   LayoutGrid, List, Calendar, MapPin, Users,
-  TrendingUp, FileText, Clock, ChevronRight
+  TrendingUp, FileText, Clock, ChevronRight, Loader2, AlertCircle
 } from "lucide-react";
 import { APP_TITLE } from "@/const";
+import { useFuneralHomeAuth } from "@/hooks/useAuth";
 
 export default function FuneralHomeDashboard() {
   const [, setLocation] = useLocation();
+  const { session, isLoading: authLoading, isDemo, logout } = useFuneralHomeAuth();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [memorials, setMemorials] = useState<Memorial[]>([]);
   const [funeralHome, setFuneralHome] = useState<FuneralHome | null>(null);
   const [stats, setStats] = useState({ totalMemorials: 0, activeMemorials: 0, totalDedications: 0, totalPhotos: 0 });
+  const [dataLoading, setDataLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -30,17 +33,30 @@ export default function FuneralHomeDashboard() {
 
   useEffect(() => {
     const loadData = async () => {
-      const [memorialsData, funeralHomeData, statsData] = await Promise.all([
-        dataService.getMemorialsByFuneralHomeId(1),
-        dataService.getFuneralHomeById(1),
-        dataService.getStats()
-      ]);
-      setMemorials(memorialsData);
-      setFuneralHome(funeralHomeData || null);
-      setStats(statsData);
+      if (authLoading) return;
+      
+      try {
+        setDataLoading(true);
+        // Use session ID if available, otherwise use demo data (ID 1)
+        const funeralHomeId = session?.id || 1;
+        
+        const [memorialsData, funeralHomeData, statsData] = await Promise.all([
+          dataService.getMemorialsByFuneralHomeId(funeralHomeId),
+          dataService.getFuneralHomeById(funeralHomeId),
+          dataService.getStats()
+        ]);
+        setMemorials(memorialsData);
+        setFuneralHome(funeralHomeData || null);
+        setStats(statsData);
+      } catch (error) {
+        console.error("Error loading data:", error);
+        toast.error("Erro ao carregar dados");
+      } finally {
+        setDataLoading(false);
+      }
     };
     loadData();
-  }, []);
+  }, [authLoading, session]);
 
   const handleCreateMemorial = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +102,7 @@ export default function FuneralHomeDashboard() {
               variant="ghost" 
               size="sm"
               className="text-gray-600"
-              onClick={() => setLocation("/")}
+              onClick={logout}
             >
               <LogOut className="w-4 h-4" />
             </Button>
@@ -135,14 +151,14 @@ export default function FuneralHomeDashboard() {
               <p className="text-xs text-gray-500 truncate">{funeralHome?.email}</p>
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            className="w-full justify-start gap-2 text-gray-600"
-            onClick={() => setLocation("/")}
-          >
-            <LogOut className="w-4 h-4" />
-            Sair
-          </Button>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start gap-2 text-gray-600"
+              onClick={logout}
+            >
+              <LogOut className="w-4 h-4" />
+              Sair
+            </Button>
         </div>
       </aside>
 

@@ -10,6 +10,7 @@ export interface AdminSession {
   name: string;
   email: string;
   type: string;
+  isDemo: boolean;
   loginTime: string;
 }
 
@@ -89,28 +90,26 @@ class AdminService {
   }
 
   isAuthenticated(): boolean {
-    return this.getSession() !== null;
-  }
-
-  // Authentication
-  async login(email: string, password: string): Promise<AdminSession> {
-    // For now, we'll use a simple validation
-    // In production, this should call the tRPC admin.login endpoint
+    const session = this.getSession();
+    if (!session) return false;
     
-    // Simple validation for demo purposes
-    if (email && password.length >= 6) {
-      const session: AdminSession = {
-        id: 1,
-        name: 'Administrador',
-        email: email,
-        type: 'admin',
-        loginTime: new Date().toISOString(),
-      };
-      this.setSession(session);
-      return session;
+    // Check if session is expired (24 hours)
+    const loginTime = new Date(session.loginTime);
+    const now = new Date();
+    const hoursDiff = (now.getTime() - loginTime.getTime()) / (1000 * 60 * 60);
+    
+    if (hoursDiff > 24) {
+      this.clearSession();
+      return false;
     }
     
-    throw new Error('E-mail ou senha inválidos');
+    return true;
+  }
+
+  // Authentication is now handled via tRPC in AdminLoginPage
+  // This method is kept for compatibility but should not be used directly
+  async login(email: string, password: string): Promise<AdminSession> {
+    throw new Error('Use tRPC admin.login mutation instead');
   }
 
   logout(): void {
