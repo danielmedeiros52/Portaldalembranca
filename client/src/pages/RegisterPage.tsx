@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { useLocation, useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -12,10 +12,15 @@ import { authService, RegisterData } from "@/services/authService";
 
 export default function RegisterPage() {
   const [, setLocation] = useLocation();
+  const searchString = useSearch();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [userType, setUserType] = useState<"funeral_home" | "family">("family");
+  
+  // Get plan from URL query params
+  const urlParams = new URLSearchParams(searchString);
+  const selectedPlan = urlParams.get("plan");
   const [acceptTerms, setAcceptTerms] = useState(false);
   
   // Form fields
@@ -95,9 +100,11 @@ export default function RegisterPage() {
       
       if (response.success) {
         toast.success(response.message);
-        // Redirect to appropriate dashboard
+        // Redirect to checkout if plan was selected, otherwise to dashboard
         if (userType === "funeral_home") {
           setLocation("/dashboard/funeral-home");
+        } else if (selectedPlan) {
+          setLocation(`/checkout?plan=${selectedPlan}`);
         } else {
           setLocation("/dashboard/family");
         }

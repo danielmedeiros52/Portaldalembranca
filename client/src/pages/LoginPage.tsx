@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { useLocation, useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -7,17 +7,25 @@ import { QrCode, Building2, Users, ArrowLeft, Eye, EyeOff, Mail, Lock, Loader2 }
 import { APP_TITLE } from "@/const";
 import { trpc } from "@/lib/trpc";
 
-// Demo credentials
-const DEMO_EMAIL = "demo@portaldalembranca.com";
-const DEMO_PASSWORD = "demo123456";
-
 export default function LoginPage() {
   const [, setLocation] = useLocation();
+  const searchString = useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<"funeral_home" | "family">("funeral_home");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get plan from URL query params
+  const urlParams = new URLSearchParams(searchString);
+  const selectedPlan = urlParams.get("plan");
+
+  // If there's a plan selected, default to family tab
+  useEffect(() => {
+    if (selectedPlan) {
+      setUserType("family");
+    }
+  }, [selectedPlan]);
 
   // tRPC mutations for real authentication
   const funeralHomeLoginMutation = trpc.auth.funeralHomeLogin.useMutation();
@@ -40,32 +48,6 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Check if it's demo mode
-      const isDemoMode = email.toLowerCase() === DEMO_EMAIL && password === DEMO_PASSWORD;
-
-      if (isDemoMode) {
-        // Demo mode - simulate login with demo data
-        toast.success("Login realizado com sucesso! (Modo Demonstração)");
-        
-        // Store demo session
-        const demoSession = {
-          id: 0,
-          name: userType === "funeral_home" ? "Funerária Demo" : "Família Demo",
-          email: DEMO_EMAIL,
-          type: userType,
-          isDemo: true,
-          loginTime: new Date().toISOString(),
-        };
-        localStorage.setItem("userSession", JSON.stringify(demoSession));
-        
-        if (userType === "funeral_home") {
-          setLocation("/dashboard/funeral-home");
-        } else {
-          setLocation("/dashboard/family");
-        }
-        return;
-      }
-
       // Real authentication via tRPC
       if (userType === "funeral_home") {
         const result = await funeralHomeLoginMutation.mutateAsync({ email, password });
@@ -98,7 +80,13 @@ export default function LoginPage() {
         localStorage.setItem("userSession", JSON.stringify(session));
         
         toast.success("Login realizado com sucesso!");
-        setLocation("/dashboard/family");
+        
+        // Redirect to checkout with selected plan if one was chosen
+        if (selectedPlan) {
+          setLocation(`/checkout?plan=${selectedPlan}`);
+        } else {
+          setLocation("/dashboard/family");
+        }
       }
     } catch (error: any) {
       console.error("Login error:", error);
@@ -106,12 +94,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const fillDemoCredentials = () => {
-    setEmail(DEMO_EMAIL);
-    setPassword(DEMO_PASSWORD);
-    toast.info("Credenciais de demonstração preenchidas");
   };
 
   return (
@@ -176,6 +158,18 @@ export default function LoginPage() {
           <div className="card-modern p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Olá! Acesse sua conta</h2>
             <p className="text-gray-500 mb-8">Preencha seus dados para acessar o portal.</p>
+
+            {/* Plan Selection Notice */}
+            {selectedPlan && (
+              <div className="mb-6 p-4 bg-teal-50 rounded-xl border border-teal-200">
+                <p className="text-sm text-teal-800 text-center">
+                  <strong>Plano selecionado:</strong> {selectedPlan === 'essencial' ? 'Memorial Essencial' : selectedPlan === 'premium' ? 'Memorial Premium' : 'Plano Família'}
+                </p>
+                <p className="text-xs text-teal-600 text-center mt-1">
+                  Faça login ou cadastre-se para continuar com a contratação.
+                </p>
+              </div>
+            )}
 
             <Tabs value={userType} onValueChange={(v) => setUserType(v as "funeral_home" | "family")}>
               <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 p-1 rounded-xl">
@@ -303,33 +297,17 @@ export default function LoginPage() {
                         Entrando...
                       </>
                     ) : (
-                      "Entrar como Família"
+                      selectedPlan ? "Entrar e Continuar" : "Entrar como Família"
                     )}
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
 
-            {/* Demo Notice */}
-            <div className="mt-6 p-4 bg-teal-50 rounded-xl border border-teal-200">
-              <p className="text-sm text-teal-800 text-center mb-3">
-                <strong>Quer testar o sistema?</strong>
-              </p>
-              <button
-                onClick={fillDemoCredentials}
-                className="w-full text-sm text-teal-700 hover:text-teal-900 font-medium py-2 px-4 rounded-lg bg-teal-100 hover:bg-teal-200 transition-colors"
-              >
-                Usar credenciais de demonstração
-              </button>
-              <p className="text-xs text-teal-600 text-center mt-2">
-                E-mail: {DEMO_EMAIL}
-              </p>
-            </div>
-
             {/* Register Link */}
             <p className="text-center text-gray-500 mt-6">
               Não tem uma conta?{" "}
-              <a href="#" onClick={(e) => { e.preventDefault(); setLocation("/register"); }} className="text-teal-600 hover:text-teal-700 font-medium">Registre-se</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); setLocation(selectedPlan ? `/register?plan=${selectedPlan}` : "/register"); }} className="text-teal-600 hover:text-teal-700 font-medium">Registre-se</a>
             </p>
           </div>
         </div>

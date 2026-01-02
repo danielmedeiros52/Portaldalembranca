@@ -252,7 +252,7 @@ export default function Home() {
                 </li>
               </ul>
               <Button
-                onClick={() => setLocation("/checkout")}
+                onClick={() => setLocation("/login?plan=essencial")}
                 variant="outline"
                 className="w-full btn-outline"
               >
@@ -307,7 +307,7 @@ export default function Home() {
                 </li>
               </ul>
               <Button 
-                onClick={() => setLocation("/checkout")}
+                onClick={() => setLocation("/login?plan=premium")}
                 className="w-full btn-primary"
               >
                 Escolher Premium
@@ -357,7 +357,7 @@ export default function Home() {
                 </li>
               </ul>
               <Button 
-                onClick={() => setLocation("/checkout")}
+                onClick={() => setLocation("/login?plan=familia")}
                 variant="outline"
                 className="w-full btn-outline"
               >

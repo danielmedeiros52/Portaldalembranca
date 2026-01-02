@@ -530,12 +530,7 @@ export default function ProfilePage() {
                 </Button>
               </form>
 
-              {/* Demo Notice */}
-              <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-200 max-w-lg">
-                <p className="text-sm text-amber-800">
-                  <strong>Modo Demonstração:</strong> Use "senhaerrada" como senha atual para simular erro de senha incorreta.
-                </p>
-              </div>
+
             </div>
           </TabsContent>
 

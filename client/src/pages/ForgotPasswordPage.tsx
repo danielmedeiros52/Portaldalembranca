@@ -95,10 +95,7 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // Demo: Allow user to simulate clicking the email link
-  const handleSimulateEmailClick = () => {
-    setStep("reset");
-  };
+
 
   return (
     <div className="min-h-screen flex">
@@ -252,19 +249,7 @@ export default function ForgotPasswordPage() {
                 </Button>
               </div>
 
-              {/* Demo Notice */}
-              <div className="mt-6 p-4 bg-sky-50 rounded-xl border border-sky-200">
-                <p className="text-sm text-sky-800 text-center mb-3">
-                  <strong>Modo Demonstração:</strong> Clique abaixo para simular o clique no link do e-mail.
-                </p>
-                <Button 
-                  variant="outline"
-                  className="w-full border-sky-300 text-sky-700 hover:bg-sky-100"
-                  onClick={handleSimulateEmailClick}
-                >
-                  Simular clique no link do e-mail
-                </Button>
-              </div>
+
             </div>
           )}
 

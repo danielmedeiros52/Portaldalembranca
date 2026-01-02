@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { 
@@ -15,6 +15,7 @@ type CheckoutStep = "plan" | "payment" | "processing" | "success";
 
 export default function CheckoutPage() {
   const [, setLocation] = useLocation();
+  const searchString = useSearch();
   const [step, setStep] = useState<CheckoutStep>("plan");
   const [isLoading, setIsLoading] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -22,6 +23,10 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [paymentIntent, setPaymentIntent] = useState<PaymentIntent | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
+  
+  // Get plan from URL query params
+  const urlParams = new URLSearchParams(searchString);
+  const planFromUrl = urlParams.get("plan");
   
   // Card form data
   const [cardData, setCardData] = useState<CardData>({
@@ -41,7 +46,18 @@ export default function CheckoutPage() {
     try {
       const plansData = await paymentService.getPlans();
       setPlans(plansData);
-      // Pre-select popular plan
+      
+      // Check if there's a plan from URL
+      if (planFromUrl) {
+        const urlPlan = plansData.find(p => p.id === planFromUrl);
+        if (urlPlan) {
+          setSelectedPlan(urlPlan);
+          setStep("payment"); // Go directly to payment step
+          return;
+        }
+      }
+      
+      // Pre-select popular plan if no URL plan
       const popularPlan = plansData.find(p => p.popular);
       if (popularPlan) {
         setSelectedPlan(popularPlan);
@@ -478,13 +494,7 @@ Continuar para Pagamento
                         </div>
                       </div>
 
-                      {/* Demo Notice */}
-                      <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
-                        <p className="text-sm text-amber-800">
-                          <strong>Modo Demonstração:</strong> Use qualquer número de cartão válido. 
-                          Cartões terminados em 0000 serão recusados, e 9999 terão saldo insuficiente.
-                        </p>
-                      </div>
+
                     </div>
                   )}
 
