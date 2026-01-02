@@ -124,6 +124,12 @@ const authRouter = router({
 
 // Memorial Router
 const memorialRouter = router({
+  // Get all public active memorials (for public listing page)
+  getPublicMemorials: publicProcedure
+    .query(async () => {
+      return db.getPublicMemorials();
+    }),
+
   // Get memorials by funeral home
   getByFuneralHome: protectedProcedure
     .input(z.object({ funeralHomeId: z.number() }))
