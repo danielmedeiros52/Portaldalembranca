@@ -18,7 +18,7 @@ type ModuleMetadata = {
 const controllerMetadata = new WeakMap<object, { prefix: string }>();
 const moduleMetadata = new WeakMap<object, ModuleMetadata>();
 const routeMetadata = new WeakMap<object, RouteDefinition[]>();
-const parameterMetadata = new WeakMap<object, Map<string | symbol, Array<{ index: number; type: 'body' }>>>();
+const parameterMetadata = new WeakMap<object, Map<string | symbol, Array<{ index: number; type: 'body' | 'param'; paramName?: string }>>>();
 
 export class Logger {
   constructor(private readonly context: string) {}
@@ -78,6 +78,16 @@ export function Body() {
     const params = parameterMetadata.get(target.constructor) ?? new Map();
     const descriptors = params.get(propertyKey) ?? [];
     descriptors.push({ index: parameterIndex, type: 'body' });
+    params.set(propertyKey, descriptors);
+    parameterMetadata.set(target.constructor, params);
+  };
+}
+
+export function Param(paramName: string) {
+  return (target: object, propertyKey: string | symbol, parameterIndex: number) => {
+    const params = parameterMetadata.get(target.constructor) ?? new Map();
+    const descriptors = params.get(propertyKey) ?? [];
+    descriptors.push({ index: parameterIndex, type: 'param', paramName });
     params.set(propertyKey, descriptors);
     parameterMetadata.set(target.constructor, params);
   };
@@ -156,9 +166,11 @@ class MiniNestApplication {
           async (req: Request, res: Response) => {
             try {
               const args: unknown[] = [];
-              paramMeta.forEach((param: { index: number; type: 'body' }) => {
+              paramMeta.forEach((param: { index: number; type: 'body' | 'param'; paramName?: string }) => {
                 if (param.type === 'body') {
                   args[param.index] = req.body;
+                } else if (param.type === 'param' && param.paramName) {
+                  args[param.index] = req.params[param.paramName];
                 }
               });
 

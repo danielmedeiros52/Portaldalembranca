@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post } from '../framework/nest-like';
+import { BadRequestException, Body, Controller, Get, Param, Post } from '../framework/nest-like';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 
@@ -6,16 +6,49 @@ import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService = new PaymentsService()) {}
 
+  /**
+   * Create a payment intent
+   * POST /api/payments/intent
+   */
   @Post('intent')
   async createPaymentIntent(@Body() payload: CreatePaymentIntentDto) {
-    const { amount, currency } = payload;
+    const { amount, planId, paymentMethodType } = payload;
 
-    if (typeof amount !== 'number' || Number.isNaN(amount) || amount <= 0) {
-      throw new BadRequestException('amount must be a positive number');
+    // Either amount or planId must be provided
+    if (!planId && (typeof amount !== 'number' || Number.isNaN(amount) || amount <= 0)) {
+      throw new BadRequestException('amount must be a positive number or planId must be provided');
     }
 
-    const safeCurrency = currency ?? 'usd';
+    return this.paymentsService.createPaymentIntent(payload);
+  }
 
-    return this.paymentsService.createPaymentIntent(amount, safeCurrency);
+  /**
+   * Create a PIX payment intent
+   * POST /api/payments/pix
+   */
+  @Post('pix')
+  async createPixPayment(@Body() payload: CreatePaymentIntentDto) {
+    return this.paymentsService.createPixPaymentIntent(payload);
+  }
+
+  /**
+   * Create a Boleto payment intent
+   * POST /api/payments/boleto
+   */
+  @Post('boleto')
+  async createBoletoPayment(@Body() payload: CreatePaymentIntentDto) {
+    return this.paymentsService.createBoletoPaymentIntent(payload);
+  }
+
+  /**
+   * Get payment intent status
+   * GET /api/payments/intent/:id
+   */
+  @Get('intent/:id')
+  async getPaymentIntent(@Param('id') id: string) {
+    if (!id) {
+      throw new BadRequestException('Payment intent ID is required');
+    }
+    return this.paymentsService.getPaymentIntent(id);
   }
 }

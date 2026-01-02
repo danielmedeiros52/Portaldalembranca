@@ -508,8 +508,26 @@ Continuar para Pagamento
                         </div>
                       ) : paymentIntent ? (
                         <>
-                          <div className="w-48 h-48 mx-auto mb-4 bg-gray-100 rounded-xl flex items-center justify-center">
-                            <QrCode className="w-32 h-32 text-gray-800" />
+                          <div className="w-56 h-56 mx-auto mb-4 bg-white rounded-xl flex items-center justify-center border-2 border-gray-200 p-2">
+                            {paymentIntent.pixQrCode && paymentIntent.pixQrCode.startsWith('data:') ? (
+                              <img 
+                                src={paymentIntent.pixQrCode} 
+                                alt="QR Code PIX" 
+                                className="w-full h-full object-contain"
+                              />
+                            ) : paymentIntent.pixQrCode && paymentIntent.pixQrCode.startsWith('http') ? (
+                              <img 
+                                src={paymentIntent.pixQrCode} 
+                                alt="QR Code PIX" 
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <img 
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentIntent.pixQrCode || '')}`}
+                                alt="QR Code PIX" 
+                                className="w-full h-full object-contain"
+                              />
+                            )}
                           </div>
                           <p className="text-gray-500 mb-4">Escaneie o QR Code ou copie o código abaixo</p>
                           <div className="flex items-center gap-2 max-w-md mx-auto">
@@ -517,22 +535,28 @@ Continuar para Pagamento
                               type="text"
                               value={paymentIntent.pixQrCode || ""}
                               readOnly
-                              className="input-modern text-sm"
+                              className="input-modern text-sm font-mono text-xs"
                             />
                             <Button
                               variant="outline"
                               className="flex-shrink-0"
                               onClick={handleCopyPix}
                             >
-                              {pixCopied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                              {pixCopied ? <CheckCircle className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                             </Button>
                           </div>
-                          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
-                            <Clock className="w-4 h-4" />
-                            <span>Válido por 30 minutos</span>
-                          </div>
+                          {paymentIntent.pixExpiresAt && (
+                            <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
+                              <Clock className="w-4 h-4" />
+                              <span>Válido até {new Date(paymentIntent.pixExpiresAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                          )}
                         </>
-                      ) : null}
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <p className="text-gray-500">Erro ao gerar QR Code. Tente novamente.</p>
+                        </div>
+                      )}
                     </div>
                   )}
 

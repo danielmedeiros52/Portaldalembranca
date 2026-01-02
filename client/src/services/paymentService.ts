@@ -1,13 +1,8 @@
 /**
  * Payment Service Layer
  * 
- * This service handles payment operations with mocked API responses.
- * Structured for easy integration with Stripe.
- * 
- * To integrate with Stripe:
- * 1. Install @stripe/stripe-js and @stripe/react-stripe-js
- * 2. Replace mock responses with actual Stripe API calls
- * 3. Implement webhook handlers on the backend
+ * This service handles payment operations with real Stripe integration.
+ * Supports Card, PIX, and Boleto payment methods.
  */
 
 // Types
@@ -16,13 +11,13 @@ export interface Plan {
   name: string;
   description: string;
   price: number;
-  renewalPrice?: number; // Preço de renovação (a partir do 2º ano)
+  renewalPrice?: number;
   currency: string;
   interval: 'month' | 'year' | 'one_time';
   features: string[];
   popular?: boolean;
-  stripePriceId?: string; // For Stripe integration
-  hasPlate?: boolean; // Indica se o plano inclui placa física
+  stripePriceId?: string;
+  hasPlate?: boolean;
 }
 
 export interface PaymentMethod {
@@ -39,7 +34,10 @@ export interface CreatePaymentIntentData {
   planId: string;
   paymentMethodType: 'card' | 'pix' | 'boleto';
   memorialId?: number;
-  isRenewal?: boolean; // Indica se é renovação
+  isRenewal?: boolean;
+  customerEmail?: string;
+  customerName?: string;
+  customerTaxId?: string; // CPF/CNPJ for Boleto
 }
 
 export interface PaymentIntent {
@@ -51,9 +49,10 @@ export interface PaymentIntent {
   paymentMethodType: string;
   pixQrCode?: string;
   pixQrCodeBase64?: string;
+  pixExpiresAt?: string;
   boletoUrl?: string;
   boletoBarcode?: string;
-  expiresAt?: string;
+  boletoExpiresAt?: string;
 }
 
 export interface Subscription {
@@ -81,17 +80,20 @@ export interface CardData {
   holderName: string;
 }
 
-// Simulated delay to mimic API latency
-const simulateDelay = (ms: number = 800) => new Promise(resolve => setTimeout(resolve, ms));
+// Stripe publishable key from environment
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
 
-// Available plans - Nova estrutura de preços
+// API base URL
+const API_BASE_URL = '/api';
+
+// Available plans
 const PLANS: Plan[] = [
   {
     id: 'essencial',
     name: 'Memorial Essencial',
     description: 'Ideal para preservar memórias de forma simples e acessível',
     price: 19.90,
-    renewalPrice: 19.90, // Mesmo preço na renovação
+    renewalPrice: 19.90,
     currency: 'BRL',
     interval: 'year',
     stripePriceId: 'price_essencial_annual',
@@ -110,7 +112,7 @@ const PLANS: Plan[] = [
     name: 'Memorial Premium',
     description: 'Recursos completos com placa física para homenagens especiais',
     price: 99.90,
-    renewalPrice: 29.90, // Preço reduzido a partir do 2º ano (sem custo da placa)
+    renewalPrice: 29.90,
     currency: 'BRL',
     interval: 'year',
     popular: true,
@@ -131,7 +133,7 @@ const PLANS: Plan[] = [
     name: 'Plano Família',
     description: 'Para famílias que desejam preservar múltiplas memórias',
     price: 249.90,
-    renewalPrice: 59.90, // Preço reduzido a partir do 2º ano (sem custo das placas)
+    renewalPrice: 59.90,
     currency: 'BRL',
     interval: 'year',
     stripePriceId: 'price_familia_annual',
@@ -150,16 +152,32 @@ const PLANS: Plan[] = [
 ];
 
 class PaymentService {
+  private stripePromise: Promise<any> | null = null;
+
+  /**
+   * Load Stripe.js
+   */
+  private async loadStripe(): Promise<any> {
+    if (!this.stripePromise) {
+      // Dynamically load Stripe.js
+      if (!(window as any).Stripe) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://js.stripe.com/v3/';
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Failed to load Stripe.js'));
+          document.head.appendChild(script);
+        });
+      }
+      this.stripePromise = Promise.resolve((window as any).Stripe(STRIPE_PUBLISHABLE_KEY));
+    }
+    return this.stripePromise;
+  }
+
   /**
    * Get available plans
-   * GET /api/payments/plans
    */
   async getPlans(): Promise<Plan[]> {
-    await simulateDelay(300);
-
-    // TODO: Replace with actual API call
-    // return fetch('/api/payments/plans').then(r => r.json());
-
     return PLANS;
   }
 
@@ -167,8 +185,7 @@ class PaymentService {
    * Get plan by ID
    */
   async getPlanById(planId: string): Promise<Plan | undefined> {
-    const plans = await this.getPlans();
-    return plans.find(p => p.id === planId);
+    return PLANS.find(p => p.id === planId);
   }
 
   /**
@@ -179,193 +196,228 @@ class PaymentService {
   }
 
   /**
-   * Create payment intent
-   * POST /api/payments/create-intent
-   * 
-   * This will be replaced with Stripe's createPaymentIntent
+   * Create payment intent via backend API
    */
   async createPaymentIntent(data: CreatePaymentIntentData): Promise<PaymentResponse> {
-    await simulateDelay(1000);
+    try {
+      const response = await fetch(`${API_BASE_URL}/payments/intent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          planId: data.planId,
+          paymentMethodType: data.paymentMethodType,
+          memorialId: data.memorialId,
+          isRenewal: data.isRenewal,
+          customerEmail: data.customerEmail,
+          customerName: data.customerName,
+        }),
+      });
 
-    // TODO: Replace with actual Stripe API call
-    // return fetch('/api/payments/create-intent', {
-    //   method: 'POST',
-    //   headers: { 
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${token}`
-    //   },
-    //   body: JSON.stringify(data)
-    // }).then(r => r.json());
+      if (!response.ok) {
+        const error = await response.json();
+        return {
+          success: false,
+          message: error.message || 'Erro ao criar intenção de pagamento.',
+          error: 'API_ERROR'
+        };
+      }
 
-    const plan = await this.getPlanById(data.planId);
-    
-    if (!plan) {
+      const result = await response.json();
+      const plan = await this.getPlanById(data.planId);
+
+      const paymentIntent: PaymentIntent = {
+        id: result.id,
+        clientSecret: result.client_secret || '',
+        amount: result.amount,
+        currency: result.currency,
+        status: result.status as PaymentIntent['status'],
+        paymentMethodType: data.paymentMethodType,
+      };
+
+      // Add PIX specific data
+      if (data.paymentMethodType === 'pix' && result.pix_qr_code) {
+        paymentIntent.pixQrCode = result.pix_qr_code;
+        paymentIntent.pixExpiresAt = result.pix_qr_code_expires_at;
+      }
+
+      // Add Boleto specific data
+      if (data.paymentMethodType === 'boleto') {
+        paymentIntent.boletoUrl = result.boleto_url;
+        paymentIntent.boletoBarcode = result.boleto_barcode;
+        paymentIntent.boletoExpiresAt = result.boleto_expires_at;
+      }
+
+      return {
+        success: true,
+        message: 'Intenção de pagamento criada com sucesso.',
+        paymentIntent
+      };
+    } catch (error) {
+      console.error('Error creating payment intent:', error);
       return {
         success: false,
-        message: 'Plano não encontrado.',
-        error: 'PLAN_NOT_FOUND'
+        message: 'Erro ao conectar com o servidor de pagamentos.',
+        error: 'NETWORK_ERROR'
       };
     }
-
-    // Usa preço de renovação se for renovação
-    const amount = data.isRenewal ? this.getRenewalPrice(plan) : plan.price;
-
-    const paymentIntent: PaymentIntent = {
-      id: 'pi_mock_' + Date.now(),
-      clientSecret: 'pi_mock_secret_' + Date.now(),
-      amount: amount * 100, // Stripe uses cents
-      currency: plan.currency.toLowerCase(),
-      status: 'requires_payment_method',
-      paymentMethodType: data.paymentMethodType
-    };
-
-    // Add PIX specific data
-    if (data.paymentMethodType === 'pix') {
-      paymentIntent.pixQrCode = '00020126580014br.gov.bcb.pix0136mock-pix-key-portal-da-lembranca';
-      paymentIntent.pixQrCodeBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
-      paymentIntent.expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // 30 minutes
-    }
-
-    // Add Boleto specific data
-    if (data.paymentMethodType === 'boleto') {
-      paymentIntent.boletoUrl = 'https://mock-boleto-url.com/boleto/123456';
-      paymentIntent.boletoBarcode = '23793.38128 60000.000003 00000.000400 1 84340000009990';
-      paymentIntent.expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(); // 3 days
-    }
-
-    return {
-      success: true,
-      message: 'Intenção de pagamento criada com sucesso.',
-      paymentIntent
-    };
   }
 
   /**
-   * Process card payment
-   * POST /api/payments/process-card
+   * Process card payment using Stripe.js
    */
   async processCardPayment(paymentIntentId: string, cardData: CardData): Promise<PaymentResponse> {
-    await simulateDelay(2000);
-
-    // TODO: Replace with actual Stripe confirmCardPayment
-    // const stripe = await loadStripe(STRIPE_PUBLIC_KEY);
-    // const result = await stripe.confirmCardPayment(clientSecret, {
-    //   payment_method: { card: cardElement }
-    // });
-
-    // Validate card number (basic validation)
-    const cardNumber = cardData.number.replace(/\s/g, '');
-    if (cardNumber.length < 13 || cardNumber.length > 19) {
-      return {
-        success: false,
-        message: 'Número do cartão inválido.',
-        error: 'INVALID_CARD_NUMBER'
-      };
-    }
-
-    // Mock: Simulate declined card
-    if (cardNumber.endsWith('0000')) {
-      return {
-        success: false,
-        message: 'Cartão recusado. Por favor, tente outro cartão.',
-        error: 'CARD_DECLINED'
-      };
-    }
-
-    // Mock: Simulate insufficient funds
-    if (cardNumber.endsWith('9999')) {
-      return {
-        success: false,
-        message: 'Saldo insuficiente.',
-        error: 'INSUFFICIENT_FUNDS'
-      };
-    }
-
-    return {
-      success: true,
-      message: 'Pagamento realizado com sucesso!',
-      paymentIntent: {
-        id: paymentIntentId,
-        clientSecret: '',
-        amount: 0,
-        currency: 'brl',
-        status: 'succeeded',
-        paymentMethodType: 'card'
+    try {
+      const stripe = await this.loadStripe();
+      
+      if (!stripe) {
+        return {
+          success: false,
+          message: 'Erro ao carregar sistema de pagamento.',
+          error: 'STRIPE_LOAD_ERROR'
+        };
       }
-    };
+
+      // Get the payment intent to get the client secret
+      const intentResponse = await fetch(`${API_BASE_URL}/payments/intent/${paymentIntentId}`);
+      const intent = await intentResponse.json();
+
+      if (!intent.client_secret) {
+        return {
+          success: false,
+          message: 'Erro ao obter dados do pagamento.',
+          error: 'MISSING_CLIENT_SECRET'
+        };
+      }
+
+      // Confirm the payment with card details
+      const { error, paymentIntent } = await stripe.confirmCardPayment(intent.client_secret, {
+        payment_method: {
+          card: {
+            number: cardData.number.replace(/\s/g, ''),
+            exp_month: parseInt(cardData.expMonth),
+            exp_year: parseInt(cardData.expYear.length === 2 ? '20' + cardData.expYear : cardData.expYear),
+            cvc: cardData.cvc,
+          },
+          billing_details: {
+            name: cardData.holderName,
+          },
+        },
+      });
+
+      if (error) {
+        let message = 'Erro ao processar pagamento.';
+        if (error.code === 'card_declined') {
+          message = 'Cartão recusado. Por favor, tente outro cartão.';
+        } else if (error.code === 'insufficient_funds') {
+          message = 'Saldo insuficiente.';
+        } else if (error.code === 'invalid_card_number') {
+          message = 'Número do cartão inválido.';
+        } else if (error.code === 'invalid_expiry_month' || error.code === 'invalid_expiry_year') {
+          message = 'Data de validade inválida.';
+        } else if (error.code === 'invalid_cvc') {
+          message = 'Código de segurança inválido.';
+        } else if (error.message) {
+          message = error.message;
+        }
+
+        return {
+          success: false,
+          message,
+          error: error.code || 'PAYMENT_ERROR'
+        };
+      }
+
+      if (paymentIntent.status === 'succeeded') {
+        return {
+          success: true,
+          message: 'Pagamento realizado com sucesso!',
+          paymentIntent: {
+            id: paymentIntent.id,
+            clientSecret: '',
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency,
+            status: 'succeeded',
+            paymentMethodType: 'card'
+          }
+        };
+      }
+
+      return {
+        success: false,
+        message: 'Pagamento não foi concluído. Por favor, tente novamente.',
+        error: 'PAYMENT_INCOMPLETE'
+      };
+    } catch (error) {
+      console.error('Error processing card payment:', error);
+      return {
+        success: false,
+        message: 'Erro ao processar pagamento. Tente novamente.',
+        error: 'PROCESSING_ERROR'
+      };
+    }
   }
 
   /**
-   * Confirm PIX payment
-   * POST /api/payments/confirm-pix
+   * Confirm PIX payment (check status)
    */
   async confirmPixPayment(paymentIntentId: string): Promise<PaymentResponse> {
-    await simulateDelay(1500);
+    try {
+      const response = await fetch(`${API_BASE_URL}/payments/intent/${paymentIntentId}`);
+      const intent = await response.json();
 
-    // TODO: Replace with actual webhook handler
-    // PIX confirmation usually comes via webhook from Stripe
-
-    return {
-      success: true,
-      message: 'Pagamento PIX confirmado com sucesso!',
-      paymentIntent: {
-        id: paymentIntentId,
-        clientSecret: '',
-        amount: 0,
-        currency: 'brl',
-        status: 'succeeded',
-        paymentMethodType: 'pix'
+      if (intent.status === 'succeeded') {
+        return {
+          success: true,
+          message: 'Pagamento PIX confirmado com sucesso!',
+          paymentIntent: {
+            id: intent.id,
+            clientSecret: '',
+            amount: intent.amount,
+            currency: intent.currency,
+            status: 'succeeded',
+            paymentMethodType: 'pix'
+          }
+        };
       }
-    };
+
+      return {
+        success: false,
+        message: 'Aguardando confirmação do pagamento PIX.',
+        error: 'PAYMENT_PENDING'
+      };
+    } catch (error) {
+      console.error('Error confirming PIX payment:', error);
+      return {
+        success: false,
+        message: 'Erro ao verificar pagamento. Tente novamente.',
+        error: 'CONFIRMATION_ERROR'
+      };
+    }
   }
 
   /**
    * Get user's payment methods
-   * GET /api/payments/methods
    */
   async getPaymentMethods(): Promise<PaymentMethod[]> {
-    await simulateDelay(500);
-
-    // TODO: Replace with actual Stripe API call
-    // return fetch('/api/payments/methods', {
-    //   headers: { 'Authorization': `Bearer ${token}` }
-    // }).then(r => r.json());
-
-    // Mock payment methods
-    return [
-      {
-        id: 'pm_mock_1',
-        type: 'card',
-        last4: '4242',
-        brand: 'visa',
-        expiryMonth: 12,
-        expiryYear: 2025,
-        isDefault: true
-      }
-    ];
+    // TODO: Implement with backend API
+    return [];
   }
 
   /**
    * Get user's subscriptions
-   * GET /api/payments/subscriptions
    */
   async getSubscriptions(): Promise<Subscription[]> {
-    await simulateDelay(500);
-
-    // TODO: Replace with actual Stripe API call
-
+    // TODO: Implement with backend API
     return [];
   }
 
   /**
    * Cancel subscription
-   * POST /api/payments/subscriptions/:id/cancel
    */
   async cancelSubscription(subscriptionId: string): Promise<PaymentResponse> {
-    await simulateDelay();
-
-    // TODO: Replace with actual Stripe API call
-
+    // TODO: Implement with backend API
     return {
       success: true,
       message: 'Assinatura cancelada. Você ainda terá acesso até o final do período pago.'
@@ -374,24 +426,10 @@ class PaymentService {
 
   /**
    * Get payment history
-   * GET /api/payments/history
    */
   async getPaymentHistory(): Promise<any[]> {
-    await simulateDelay(500);
-
-    // TODO: Replace with actual API call
-
-    return [
-      {
-        id: 'pay_mock_1',
-        amount: 99.90,
-        currency: 'BRL',
-        status: 'succeeded',
-        description: 'Memorial Premium - Maria Silva Santos',
-        createdAt: '2024-12-15T10:30:00Z',
-        paymentMethod: 'Visa •••• 4242'
-      }
-    ];
+    // TODO: Implement with backend API
+    return [];
   }
 
   /**
@@ -426,6 +464,13 @@ class PaymentService {
       hipercard: 'hipercard'
     };
     return brands[brand.toLowerCase()] || 'card';
+  }
+
+  /**
+   * Get Stripe publishable key
+   */
+  getPublishableKey(): string {
+    return STRIPE_PUBLISHABLE_KEY;
   }
 }
 
