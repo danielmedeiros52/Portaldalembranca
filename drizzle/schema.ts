@@ -6,6 +6,9 @@ import { pgTable, serial, text, timestamp, varchar, boolean, integer, pgEnum } f
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const visibilityEnum = pgEnum("visibility", ["public", "private"]);
 export const statusEnum = pgEnum("status", ["active", "pending_data", "inactive"]);
+export const productionStatusEnum = pgEnum("production_status", ["new", "in_production", "waiting_data", "ready", "delivered", "cancelled"]);
+export const priorityEnum = pgEnum("priority", ["low", "normal", "high", "urgent"]);
+export const leadStatusEnum = pgEnum("lead_status", ["pending", "contacted", "converted", "rejected"]);
 
 /**
  * Core user table backing auth flow.
@@ -150,3 +153,73 @@ export const leads = pgTable("leads", {
 
 export type Lead = typeof leads.$inferSelect;
 export type InsertLead = typeof leads.$inferInsert;
+
+/**
+ * Orders table for production queue management
+ */
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  memorialId: integer("memorial_id").notNull(),
+  funeralHomeId: integer("funeral_home_id").notNull(),
+  familyUserId: integer("family_user_id"),
+  productionStatus: productionStatusEnum("production_status").default("new").notNull(),
+  priority: priorityEnum("priority").default("normal").notNull(),
+  notes: text("notes"),
+  internalNotes: text("internal_notes"),
+  estimatedDelivery: timestamp("estimated_delivery"),
+  deliveredAt: timestamp("delivered_at"),
+  assignedTo: varchar("assigned_to", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
+
+/**
+ * Order history table for tracking status changes
+ */
+export const orderHistory = pgTable("order_history", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull(),
+  previousStatus: productionStatusEnum("previous_status"),
+  newStatus: productionStatusEnum("new_status").notNull(),
+  changedBy: varchar("changed_by", { length: 255 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type OrderHistory = typeof orderHistory.$inferSelect;
+export type InsertOrderHistory = typeof orderHistory.$inferInsert;
+
+/**
+ * Admin users table for system administrators
+ */
+export const adminUsers = pgTable("admin_users", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type InsertAdminUser = typeof adminUsers.$inferInsert;
+
+/**
+ * Dashboard settings table for admin preferences
+ */
+export const dashboardSettings = pgTable("dashboard_settings", {
+  id: serial("id").primaryKey(),
+  adminUserId: integer("admin_user_id").notNull(),
+  settingKey: varchar("setting_key", { length: 100 }).notNull(),
+  settingValue: text("setting_value"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type DashboardSetting = typeof dashboardSettings.$inferSelect;
+export type InsertDashboardSetting = typeof dashboardSettings.$inferInsert;

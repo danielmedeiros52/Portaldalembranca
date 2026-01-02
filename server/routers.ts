@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { funeralHomes, familyUsers, memorials, descendants, photos, dedications, leads, InsertMemorial, InsertDescendant, InsertPhoto, InsertDedication, InsertLead } from "../drizzle/schema";
+import { funeralHomes, familyUsers, memorials, descendants, photos, dedications, leads, orders, orderHistory, adminUsers, InsertMemorial, InsertDescendant, InsertPhoto, InsertDedication, InsertLead, InsertOrder, InsertOrderHistory, InsertAdminUser } from "../drizzle/schema";
 import * as db from "./db";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -386,6 +386,232 @@ const leadRouter = router({
     .query(async () => {
       return db.getAllLeads();
     }),
+
+  update: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      status: z.string().optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      return db.updateLead(id, data);
+    }),
+});
+
+// ============================================
+// ADMIN ROUTER - Administrative Module
+// ============================================
+
+const adminRouter = router({
+  // Admin Login
+  login: publicProcedure
+    .input(z.object({
+      email: z.string().email(),
+      password: z.string().min(6),
+    }))
+    .mutation(async ({ input }) => {
+      const admin = await db.getAdminUserByEmail(input.email);
+      if (!admin) {
+        throw new Error("E-mail ou senha inválidos");
+      }
+      if (!admin.isActive) {
+        throw new Error("Conta desativada");
+      }
+      const isPasswordValid = await bcrypt.compare(input.password, admin.passwordHash);
+      if (!isPasswordValid) {
+        throw new Error("E-mail ou senha inválidos");
+      }
+      await db.updateAdminLastLogin(admin.id);
+      return { id: admin.id, name: admin.name, email: admin.email, type: "admin" };
+    }),
+
+  // Create Admin User (for initial setup)
+  createAdmin: publicProcedure
+    .input(z.object({
+      name: z.string().min(1),
+      email: z.string().email(),
+      password: z.string().min(6),
+      setupKey: z.string(), // Simple security key for initial setup
+    }))
+    .mutation(async ({ input }) => {
+      // Simple setup key validation (you can change this)
+      if (input.setupKey !== "PORTAL_ADMIN_SETUP_2024") {
+        throw new Error("Chave de configuração inválida");
+      }
+      
+      const existing = await db.getAdminUserByEmail(input.email);
+      if (existing) {
+        throw new Error("E-mail já registrado");
+      }
+      
+      const passwordHash = await bcrypt.hash(input.password, 10);
+      const admin = await db.createAdminUser({
+        name: input.name,
+        email: input.email,
+        passwordHash,
+        isActive: true,
+      });
+      
+      if (!admin) {
+        throw new Error("Erro ao criar administrador");
+      }
+      
+      return { success: true, id: admin.id };
+    }),
+
+  // Dashboard Statistics
+  getDashboardStats: protectedProcedure
+    .query(async () => {
+      return db.getAdminDashboardStats();
+    }),
+
+  // Get all memorials for admin
+  getAllMemorials: protectedProcedure
+    .query(async () => {
+      return db.getAllMemorialsForAdmin();
+    }),
+
+  // Get all funeral homes
+  getAllFuneralHomes: protectedProcedure
+    .query(async () => {
+      return db.getAllFuneralHomes();
+    }),
+
+  // Get all family users
+  getAllFamilyUsers: protectedProcedure
+    .query(async () => {
+      return db.getAllFamilyUsers();
+    }),
+
+  // Get all leads
+  getAllLeads: protectedProcedure
+    .query(async () => {
+      return db.getAllLeads();
+    }),
+
+  // Update lead status
+  updateLead: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      status: z.string().optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      return db.updateLead(id, data);
+    }),
+
+  // ============================================
+  // ORDERS / PRODUCTION QUEUE
+  // ============================================
+
+  // Get all orders
+  getAllOrders: protectedProcedure
+    .query(async () => {
+      return db.getAllOrders();
+    }),
+
+  // Get order by ID
+  getOrderById: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      return db.getOrderById(input.id);
+    }),
+
+  // Get orders by status
+  getOrdersByStatus: protectedProcedure
+    .input(z.object({ status: z.string() }))
+    .query(async ({ input }) => {
+      return db.getOrdersByStatus(input.status);
+    }),
+
+  // Create order
+  createOrder: protectedProcedure
+    .input(z.object({
+      memorialId: z.number(),
+      funeralHomeId: z.number(),
+      familyUserId: z.number().optional(),
+      priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+      notes: z.string().optional(),
+      internalNotes: z.string().optional(),
+      estimatedDelivery: z.string().optional(),
+      assignedTo: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const order = await db.createOrder({
+        ...input,
+        estimatedDelivery: input.estimatedDelivery ? new Date(input.estimatedDelivery) : undefined,
+        productionStatus: "new",
+      });
+      
+      if (order) {
+        await db.createOrderHistory({
+          orderId: order.id,
+          newStatus: "new",
+          changedBy: "Sistema",
+          notes: "Pedido criado",
+        });
+      }
+      
+      return order;
+    }),
+
+  // Update order
+  updateOrder: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      productionStatus: z.enum(["new", "in_production", "waiting_data", "ready", "delivered", "cancelled"]).optional(),
+      priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+      notes: z.string().optional(),
+      internalNotes: z.string().optional(),
+      estimatedDelivery: z.string().optional(),
+      assignedTo: z.string().optional(),
+      changedBy: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, changedBy, ...data } = input;
+      
+      // Get current order to track status change
+      const currentOrder = await db.getOrderById(id);
+      
+      const updateData: any = { ...data };
+      if (data.estimatedDelivery) {
+        updateData.estimatedDelivery = new Date(data.estimatedDelivery);
+      }
+      if (data.productionStatus === "delivered") {
+        updateData.deliveredAt = new Date();
+      }
+      
+      const order = await db.updateOrder(id, updateData);
+      
+      // Create history entry if status changed
+      if (currentOrder && data.productionStatus && currentOrder.productionStatus !== data.productionStatus) {
+        await db.createOrderHistory({
+          orderId: id,
+          previousStatus: currentOrder.productionStatus,
+          newStatus: data.productionStatus,
+          changedBy: changedBy || "Admin",
+          notes: `Status alterado de ${currentOrder.productionStatus} para ${data.productionStatus}`,
+        });
+      }
+      
+      return order;
+    }),
+
+  // Delete order
+  deleteOrder: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      return db.deleteOrder(input.id);
+    }),
+
+  // Get order history
+  getOrderHistory: protectedProcedure
+    .input(z.object({ orderId: z.number() }))
+    .query(async ({ input }) => {
+      return db.getOrderHistory(input.orderId);
+    }),
 });
 
 export const appRouter = router({
@@ -396,6 +622,7 @@ export const appRouter = router({
   photo: photoRouter,
   dedication: dedicationRouter,
   lead: leadRouter,
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

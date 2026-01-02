@@ -16,6 +16,8 @@ import MemorialEditPage from "./pages/MemorialEditPage";
 import PublicMemorialPage from "./pages/PublicMemorialPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
 import MemorialsPage from "./pages/MemorialsPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
   return (
@@ -32,6 +34,9 @@ function Router() {
       <Route path={"/memoriais"} component={MemorialsPage} />
       <Route path={"/m/:slug"} component={PublicMemorialPage} />
       <Route path={"/accept-invitation/:token"} component={AcceptInvitationPage} />
+      {/* Admin Routes */}
+      <Route path={"/admin/login"} component={AdminLoginPage} />
+      <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
