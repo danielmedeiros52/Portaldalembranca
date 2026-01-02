@@ -2,7 +2,7 @@
   "version": 2,
   "framework": "vite",
   "installCommand": "corepack enable && corepack use pnpm@10.4.1 && pnpm install",
-  "buildCommand": "pnpm db:migrate && pnpm run build:vercel ",
+  "buildCommand": "pnpm db:migrate:neon && pnpm run build:vercel",
   "outputDirectory": "dist/public",
   "rewrites": [
     {
