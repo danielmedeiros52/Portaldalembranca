@@ -8,10 +8,6 @@ CREATE TABLE IF NOT EXISTS "leads" (
   "status" VARCHAR(50) DEFAULT 'pending' NOT NULL,
   "notes" TEXT,
   "createdAt" TIMESTAMP DEFAULT NOW() NOT NULL
-);
-
--- Create index on email for faster lookups
-CREATE INDEX IF NOT EXISTS "leads_email_idx" ON "leads" ("email");
-
--- Create index on status for filtering
+);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "leads_email_idx" ON "leads" ("email");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "leads_status_idx" ON "leads" ("status");
