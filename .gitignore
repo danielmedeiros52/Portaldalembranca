@@ -105,3 +105,8 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# Terraform
+.terraform/
+terraform.tfstate*
+*.tfvars

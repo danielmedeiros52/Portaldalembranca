@@ -1,0 +1,15 @@
+# Example configuration for deploying the Portal da Lembrança container to AWS
+aws_region        = "us-east-1"
+project_name      = "portal-da-lembranca"
+environment       = "prod"
+container_image   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/portal-da-lembranca-prod:latest"
+container_port    = 3000
+desired_count     = 1
+health_check_path = "/"
+
+# Non-sensitive environment variables passed to the container
+application_environment = {
+  NODE_ENV     = "production"
+  DATABASE_URL = "postgresql://user:password@host:5432/dbname?sslmode=require"
+  JWT_SECRET   = "replace-me"
+}
