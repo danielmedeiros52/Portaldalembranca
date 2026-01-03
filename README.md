@@ -22,6 +22,12 @@ Stack principal:
 - Rode `npm run build:vercel` para gerar os arquivos estáticos em `dist/public` que a Vercel irá publicar.
 - O `framework` está definido como Vite e o rewrite já garante que qualquer rota do app caia em `index.html`.
 
+## Deploy na AWS (Terraform)
+- Um `Dockerfile` foi adicionado para gerar a imagem usada no deploy da aplicação.
+- Há um template em `infra/terraform` que cria VPC, ECS Fargate com Application Load Balancer, repositório ECR e logs no CloudWatch.
+- Copie `infra/terraform/terraform.tfvars.example` para `infra/terraform/terraform.tfvars`, preencha com as variáveis da sua conta AWS e da aplicação, e execute `terraform init && terraform apply`.
+- Após aplicar, construa a imagem (`docker build -t portal-da-lembranca:latest .`), faça login no ECR e publique usando a URL retornada pelo Terraform.
+
 ## Pagamentos
 A integração com Stripe usa a variável `STRIPE_SECRET_KEY`. Em ambientes locais, defina uma chave de teste (`sk_test_...`). Se a chave não estiver definida, o serviço retorna um pagamento simulado para facilitar o desenvolvimento offline.
 
