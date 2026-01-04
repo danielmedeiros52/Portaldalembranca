@@ -59,7 +59,7 @@ export default function RegisterPage() {
       toast.error("Por favor, informe seu e-mail.");
       return false;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(formData.email)) {
       toast.error("Por favor, informe um e-mail válido.");
       return false;
     }
@@ -257,7 +257,7 @@ export default function RegisterPage() {
                 </TabsTrigger>
               </TabsList>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 {/* Common Fields */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
