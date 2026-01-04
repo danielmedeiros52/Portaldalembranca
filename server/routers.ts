@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
@@ -10,6 +10,35 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { generateMemorialQRCode, generateMemorialQRCodeSVG } from "./qrcode";
+import { sdk } from "./_core/sdk";
+import type { Request, Response } from "express";
+
+const FUNERAL_HOME_PREFIX = "funeral" as const;
+const FAMILY_USER_PREFIX = "family" as const;
+
+async function persistUserSession(
+  ctx: { req: Request; res: Response },
+  payload: { openId: string; name: string; email?: string | null; loginMethod: string }
+) {
+  await db.upsertUser({
+    openId: payload.openId,
+    name: payload.name || null,
+    email: payload.email ?? null,
+    loginMethod: payload.loginMethod,
+    lastSignedIn: new Date(),
+  });
+
+  const token = await sdk.createSessionToken(payload.openId, {
+    name: payload.name,
+    expiresInMs: ONE_YEAR_MS,
+  });
+  const cookieOptions = getSessionCookieOptions(ctx.req);
+  ctx.res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+}
+
+function buildAccountOpenId(prefix: string, id: number) {
+  return `${prefix}-${id}`;
+}
 
 // Helper to generate unique slug
 function generateSlug(name: string): string {
@@ -33,7 +62,7 @@ const authRouter = router({
       email: z.string().email(),
       password: z.string().min(6),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const funeralHome = await db.getFuneralHomeByEmail(input.email);
       if (!funeralHome) {
         throw new Error("E-mail ou senha inválidos");
@@ -42,6 +71,14 @@ const authRouter = router({
       if (!isPasswordValid) {
         throw new Error("E-mail ou senha inválidos");
       }
+
+      await persistUserSession(ctx, {
+        openId: buildAccountOpenId(FUNERAL_HOME_PREFIX, funeralHome.id),
+        name: funeralHome.name,
+        email: funeralHome.email,
+        loginMethod: "funeral_home",
+      });
+
       return { id: funeralHome.id, name: funeralHome.name, email: funeralHome.email, type: "funeral_home" };
     }),
 
@@ -54,7 +91,7 @@ const authRouter = router({
       phone: z.string().optional(),
       address: z.string().optional(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const existing = await db.getFuneralHomeByEmail(input.email);
       if (existing) {
         throw new Error("E-mail já registrado");
@@ -71,7 +108,17 @@ const authRouter = router({
         address: input.address,
       });
 
-      return { success: true };
+      const newUser = await db.getFuneralHomeByEmail(input.email);
+      if (!newUser) throw new Error("Falha ao criar usuário");
+
+      await persistUserSession(ctx, {
+        openId: buildAccountOpenId(FUNERAL_HOME_PREFIX, newUser.id),
+        name: newUser.name,
+        email: newUser.email,
+        loginMethod: "funeral_home",
+      });
+
+      return { id: newUser.id, name: newUser.name, email: newUser.email, type: "funeral_home" };
     }),
 
   // Family User Register
@@ -82,7 +129,7 @@ const authRouter = router({
       password: z.string().min(6),
       phone: z.string().optional(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const existing = await db.getFamilyUserByEmail(input.email);
       if (existing) {
         throw new Error("E-mail já registrado");
@@ -100,7 +147,16 @@ const authRouter = router({
       });
 
       const newUser = await db.getFamilyUserByEmail(input.email);
-      return { id: newUser?.id, name: newUser?.name, email: newUser?.email, type: "family_user" };
+      if (!newUser) throw new Error("Falha ao criar usuário");
+
+      await persistUserSession(ctx, {
+        openId: buildAccountOpenId(FAMILY_USER_PREFIX, newUser.id),
+        name: newUser.name,
+        email: newUser.email,
+        loginMethod: "family_user",
+      });
+
+      return { id: newUser.id, name: newUser.name, email: newUser.email, type: "family_user" };
     }),
 
   // Family User Login
@@ -109,7 +165,7 @@ const authRouter = router({
       email: z.string().email(),
       password: z.string().min(6),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const familyUser = await db.getFamilyUserByEmail(input.email);
       if (!familyUser || !familyUser.passwordHash) {
         throw new Error("E-mail ou senha inválidos");
@@ -118,6 +174,14 @@ const authRouter = router({
       if (!isPasswordValid) {
         throw new Error("E-mail ou senha inválidos");
       }
+
+      await persistUserSession(ctx, {
+        openId: buildAccountOpenId(FAMILY_USER_PREFIX, familyUser.id),
+        name: familyUser.name,
+        email: familyUser.email,
+        loginMethod: "family_user",
+      });
+
       return { id: familyUser.id, name: familyUser.name, email: familyUser.email, type: "family_user" };
     }),
 
