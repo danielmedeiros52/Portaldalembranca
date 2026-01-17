@@ -1,7 +1,5 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-
 // Handler for Vercel Serverless Functions
-async function handler(req: VercelRequest, res: VercelResponse) {
+async function handler(req: any, res: any) {
   try {
     console.log("[tRPC] Handler invoked:", req.method, req.url);
 
