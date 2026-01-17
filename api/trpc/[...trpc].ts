@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { appRouter } from "../server/routers";
-import { sdk } from "../server/_core/sdk";
+import { appRouter } from "../../server/routers";
+import { sdk } from "../../server/_core/sdk";
 
 // Handler for Vercel Serverless Functions
 export default async function handler(req: VercelRequest, res: VercelResponse) {
