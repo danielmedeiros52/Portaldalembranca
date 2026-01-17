@@ -1,3 +1,13 @@
+// Register TypeScript path mappings for runtime module resolution
+const tsConfigPaths = require("tsconfig-paths");
+const baseUrl = require("path").resolve(__dirname, "../..");
+tsConfigPaths.register({
+  baseUrl,
+  paths: {
+    "@shared/*": ["./shared/*"],
+  },
+});
+
 // Handler for Vercel Serverless Functions
 async function handler(req: any, res: any) {
   try {

@@ -6,7 +6,7 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/trpc/[...trpc].ts": {
-      "includeFiles": "server/**"
+      "includeFiles": "{server/**,shared/**,drizzle/**}"
     }
   }
 }

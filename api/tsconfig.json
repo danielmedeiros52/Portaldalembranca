@@ -9,8 +9,12 @@
     "isolatedModules": false,
     "noEmit": false,
     "declaration": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "..",
+    "paths": {
+      "@shared/*": ["./shared/*"]
+    }
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "../server/**/*", "../shared/**/*", "../drizzle/**/*"],
   "exclude": ["node_modules"]
 }
