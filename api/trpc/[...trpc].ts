@@ -1,15 +1,15 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 // Handler for Vercel Serverless Functions
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     console.log("[tRPC] Handler invoked:", req.method, req.url);
 
-    // Dynamic imports to catch any module loading errors
+    // Require statements for CommonJS compatibility
     console.log("[tRPC] Loading modules...");
-    const { appRouter } = await import("../../server/routers");
-    const { sdk } = await import("../../server/_core/sdk");
+    const { fetchRequestHandler } = require("@trpc/server/adapters/fetch");
+    const { appRouter } = require("../../server/routers");
+    const { sdk } = require("../../server/_core/sdk");
     console.log("[tRPC] Modules loaded successfully");
 
     // Enable CORS with proper credentials handling
