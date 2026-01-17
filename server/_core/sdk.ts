@@ -182,7 +182,10 @@ class SDKServer {
     options: { expiresInMs?: number } = {}
   ): Promise<string> {
     // Dynamic import for ES-only jose module
-    const { SignJWT } = await import("jose");
+    // Use computed string to prevent TypeScript from creating static dependency
+    const joseModule = "jose";
+    const jose: any = await import(joseModule);
+    const SignJWT = jose.SignJWT;
 
     const issuedAt = Date.now();
     const expiresInMs = options.expiresInMs ?? ONE_YEAR_MS;
@@ -209,7 +212,10 @@ class SDKServer {
 
     try {
       // Dynamic import for ES-only jose module
-      const { jwtVerify } = await import("jose");
+      // Use computed string to prevent TypeScript from creating static dependency
+      const joseModule = "jose";
+      const jose: any = await import(joseModule);
+      const jwtVerify = jose.jwtVerify;
 
       const secretKey = this.getSessionSecret();
       const { payload } = await jwtVerify(cookieValue, secretKey, {
