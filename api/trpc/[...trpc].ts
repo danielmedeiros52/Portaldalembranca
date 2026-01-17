@@ -1,57 +1,63 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { appRouter } from "../../server/routers";
-import { sdk } from "../../server/_core/sdk";
 
 // Handler for Vercel Serverless Functions
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS with proper credentials handling
-  const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, "") || "*";
-
-  // Only allow credentials if origin is not wildcard
-  if (origin !== "*") {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-  } else {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-  }
-
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
-
-  // Handle preflight requests
-  if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
-  }
-
-  // Convert VercelRequest to standard Request
-  const protocol = req.headers["x-forwarded-proto"] || "https";
-  const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost";
-  const url = `${protocol}://${host}${req.url}`;
-
-  const headers = new Headers();
-  Object.entries(req.headers).forEach(([key, value]) => {
-    if (value) {
-      headers.set(key, Array.isArray(value) ? value.join(", ") : value);
-    }
-  });
-
-  // Get body for POST requests
-  let body: string | undefined;
-  if (req.method === "POST" && req.body) {
-    body = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
-  }
-
-  const request = new Request(url, {
-    method: req.method || "GET",
-    headers,
-    body: req.method === "POST" ? body : undefined,
-  });
-
   try {
-    console.log("[tRPC] Request received:", req.method, req.url);
+    console.log("[tRPC] Handler invoked:", req.method, req.url);
 
+    // Dynamic imports to catch any module loading errors
+    console.log("[tRPC] Loading modules...");
+    const { appRouter } = await import("../../server/routers");
+    const { sdk } = await import("../../server/_core/sdk");
+    console.log("[tRPC] Modules loaded successfully");
+
+    // Enable CORS with proper credentials handling
+    const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, "") || "*";
+
+    // Only allow credentials if origin is not wildcard
+    if (origin !== "*") {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+    } else {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+    }
+
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie");
+
+    // Handle preflight requests
+    if (req.method === "OPTIONS") {
+      console.log("[tRPC] Handling OPTIONS request");
+      res.status(200).end();
+      return;
+    }
+
+    // Convert VercelRequest to standard Request
+    const protocol = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost";
+    const url = `${protocol}://${host}${req.url}`;
+
+    const headers = new Headers();
+    Object.entries(req.headers).forEach(([key, value]) => {
+      if (value) {
+        headers.set(key, Array.isArray(value) ? value.join(", ") : value);
+      }
+    });
+
+    // Get body for POST requests
+    let body: string | undefined;
+    if (req.method === "POST" && req.body) {
+      body = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+    }
+
+    const request = new Request(url, {
+      method: req.method || "GET",
+      headers,
+      body: req.method === "POST" ? body : undefined,
+    });
+
+    console.log("[tRPC] Processing tRPC request...");
     const response = await fetchRequestHandler({
       endpoint: "/api/trpc",
       req: request,
@@ -88,12 +94,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(response.status);
     const responseBody = await response.text();
     res.send(responseBody);
+
+    console.log("[tRPC] Request completed successfully");
   } catch (error) {
-    console.error("tRPC handler error:", error);
+    console.error("[tRPC] Top-level error:", error);
 
     // Log detailed error information
     if (error instanceof Error) {
-      console.error("Error details:", {
+      console.error("[tRPC] Error details:", {
         message: error.message,
         stack: error.stack,
         name: error.name,
@@ -105,11 +113,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(500).json({
       error: {
         message: "Internal server error",
-        // Include error details in development
-        ...(process.env.NODE_ENV === "development" && {
-          details: error instanceof Error ? error.message : "Unknown error",
-          stack: error instanceof Error ? error.stack : undefined,
-        }),
+        details: error instanceof Error ? error.message : "Unknown error",
+        stack: process.env.NODE_ENV === "development" && error instanceof Error ? error.stack : undefined,
       },
     });
   }
