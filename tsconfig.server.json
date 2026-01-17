@@ -17,5 +17,12 @@
     "baseUrl": "."
   },
   "include": ["server/api/src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "server/api/[trpc].ts",
+    "api/**/*"
+  ]
 }
