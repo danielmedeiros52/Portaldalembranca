@@ -122,4 +122,3 @@ async function handler(req: VercelRequest, res: VercelResponse) {
 
 // CommonJS export
 module.exports = handler;
-export default handler;
