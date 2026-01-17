@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "framework": "vite",
+  "installCommand": "corepack enable && corepack use pnpm@10.4.1 && pnpm install && pnpm add -D esbuild",
+  "buildCommand": "pnpm db:migrate:neon && pnpm db:seed:historical && node scripts/bundle-serverless.mjs && pnpm run build:client",
+  "outputDirectory": "dist/public",
+  "functions": {
+    "dist/api/trpc/[...trpc].js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 10
+    },
+    "dist/api/health.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 5
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/trpc/:path*",
+      "destination": "/dist/api/trpc/[...trpc]"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/dist/api/health"
+    }
+  ]
+}

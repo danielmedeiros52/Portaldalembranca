@@ -17,6 +17,9 @@ Welcome to the Portal da Lembrança (Memorial QR MVP) documentation.
 - [Testing Guide](./TESTING.md) - Comprehensive testing documentation with Vitest and mutation testing
 - [Todo List](./todo.md) - Project tasks and development roadmap
 
+### Deployment
+- [Vercel Deployment Improvements](./VERCEL_DEPLOYMENT_IMPROVEMENTS.md) - Recommended improvements for easier Vercel deployments
+
 ### Module-Specific Documentation
 Located within their respective directories:
 - [Brand Assets](../client/public/brand/README.md) - Logo and branding resources
