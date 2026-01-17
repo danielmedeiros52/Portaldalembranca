@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 // Handler for Vercel Serverless Functions
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     console.log("[tRPC] Handler invoked:", req.method, req.url);
 
@@ -119,3 +119,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 }
+
+// CommonJS export
+module.exports = handler;
+export default handler;
