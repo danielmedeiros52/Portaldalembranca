@@ -4,7 +4,9 @@
       "Bash(git mv:*)",
       "Bash(git add:*)",
       "Bash(test:*)",
-      "Bash(pnpm test:*)"
+      "Bash(pnpm test:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)"
     ]
   }
 }
