@@ -19,6 +19,8 @@ Welcome to the Portal da Lembrança (Memorial QR MVP) documentation.
 
 ### Deployment
 - [Vercel Deployment Improvements](./VERCEL_DEPLOYMENT_IMPROVEMENTS.md) - Recommended improvements for easier Vercel deployments
+- [Tech Stack Alternatives](./TECH_STACK_ALTERNATIVES.md) - Analysis of alternative tech stacks for easier development (⭐ Recommended)
+- [Migration to Next.js](./MIGRATION_TO_NEXTJS.md) - Step-by-step guide to migrate to Next.js
 
 ### Module-Specific Documentation
 Located within their respective directories:
