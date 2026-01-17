@@ -3,5 +3,10 @@
   "framework": "vite",
   "installCommand": "corepack enable && corepack use pnpm@10.4.1 && pnpm install",
   "buildCommand": "pnpm db:migrate:neon && pnpm db:seed:historical && pnpm run build:vercel",
-  "outputDirectory": "dist/public"
+  "outputDirectory": "dist/public",
+  "functions": {
+    "api/trpc/[...trpc].ts": {
+      "includeFiles": "server/**"
+    }
+  }
 }

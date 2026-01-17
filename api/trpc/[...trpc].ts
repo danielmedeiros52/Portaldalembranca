@@ -50,17 +50,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
 
   try {
+    console.log("[tRPC] Request received:", req.method, req.url);
+
     const response = await fetchRequestHandler({
       endpoint: "/api/trpc",
       req: request,
       router: appRouter,
       createContext: async () => {
+        console.log("[tRPC] Creating context...");
         // Properly authenticate using SDK
         let user = null;
         try {
           user = await sdk.authenticateRequest(req as any);
+          console.log("[tRPC] User authenticated:", user?.openId || "none");
         } catch (error) {
           // Authentication is optional for public procedures
+          console.log("[tRPC] Authentication skipped:", error instanceof Error ? error.message : "unknown");
           user = null;
         }
 
@@ -71,6 +76,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         };
       },
     });
+
+    console.log("[tRPC] Response status:", response.status);
 
     // Copy response headers
     response.headers.forEach((value, key) => {

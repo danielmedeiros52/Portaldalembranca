@@ -1,0 +1,2 @@
+# Don't ignore any files - include everything needed for the function
+!../../server/**/*
