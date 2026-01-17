@@ -3,11 +3,11 @@ async function handler(req: any, res: any) {
   try {
     console.log("[tRPC] Handler invoked:", req.method, req.url);
 
-    // Require statements for CommonJS compatibility
+    // Dynamic imports for ES module compatibility
     console.log("[tRPC] Loading modules...");
-    const { fetchRequestHandler } = require("@trpc/server/adapters/fetch");
-    const { appRouter } = require("../../server/routers");
-    const { sdk } = require("../../server/_core/sdk");
+    const { fetchRequestHandler } = await import("@trpc/server/adapters/fetch");
+    const { appRouter } = await import("../../server/routers");
+    const { sdk } = await import("../../server/_core/sdk");
     console.log("[tRPC] Modules loaded successfully");
 
     // Enable CORS with proper credentials handling
