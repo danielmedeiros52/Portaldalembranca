@@ -6,7 +6,14 @@
       "Bash(test:*)",
       "Bash(pnpm test:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(corepack enable:*)",
+      "Bash(npx pnpm@10.4.1 install:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npx pnpm@10.4.1 add:*)"
     ]
   }
 }
